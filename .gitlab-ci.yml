@@ -1,0 +1,13 @@
+image: node:14
+
+pages:
+  stage: deploy
+  script:
+  - npm ci
+  - npm start
+  artifacts:
+    paths:
+    - public
+    expire_in: 1 day
+  only:
+  - main
