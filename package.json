@@ -11,8 +11,7 @@
   "license": "AGPL-3.0",
   "dependencies": {
     "feed": "^4.2.2",
-    "jsdom": "^16.6.0",
-    "node-fetch": "^2.6.1"
+    "playwright-firefox": "^1.11.1"
   },
   "devDependencies": {
     "@types/jsdom": "^16.2.10",

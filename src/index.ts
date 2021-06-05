@@ -1,5 +1,4 @@
-import fetch from "node-fetch";
-import { JSDOM } from "jsdom";
+import { Browser, firefox } from "playwright-firefox";
 import { Feed } from "feed";
 import { writeFile, mkdir } from "fs/promises";
 
@@ -22,6 +21,18 @@ const feedConfigs: FeedConfig[] = [
 ];
 
 run();
+let browser: Browser;
+let browsePromise: Promise<Browser>;
+async function getBrowser() {
+  if (typeof browser === "undefined") {
+    if (typeof browsePromise === "undefined") {
+      browsePromise = firefox.launch();
+    }
+    browser = await browsePromise;
+  }
+
+  return browser;
+}
 
 async function run() {
   const feedsData = await Promise.all(feedConfigs.map(generateFeed));
@@ -29,6 +40,8 @@ async function run() {
   const feed = await toFeed(combinedFeedData);
   await mkdir("public").catch(() => console.log("Directory `public` already exists; continuing."));
   await writeFile("public/feed.xml", feed, "utf-8");
+  const browser = await getBrowser();
+  await browser.close();
   console.log("Feed generated at public/feed.xml");
 }
 
@@ -43,19 +56,20 @@ type FeedData = {
 };
 
 async function generateFeed(config: FeedConfig): Promise<FeedData> {
-  const response = await fetch(config.url);
-  const rawHtml = await response.text();
-  const { document } = (new JSDOM(rawHtml)).window;
-  const entriesElements = document.querySelectorAll(config.entrySelector);
-  const entries: FeedData['elements'] = Array.from(entriesElements).map(entryElement => {
-    const titleElement = entryElement.querySelector(config.titleSelector);
-    const linkElement = entryElement.querySelector(config.linkSelector);
+  const browser = await getBrowser();
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  await page.goto(config.url);
+  const entriesElements = await page.$$(config.entrySelector);
+  const entries: FeedData['elements'] = await Promise.all(entriesElements.map(async entryElement => {
+    const titleElement = await entryElement.$(config.titleSelector);
+    const linkElement = await entryElement.$(config.linkSelector);
     return {
-      title: titleElement?.textContent ?? undefined,
-      contents: entryElement.outerHTML,
-      link: linkElement?.getAttribute("href") ?? undefined,
+      title: await titleElement?.textContent() ?? undefined,
+      contents: await entryElement.innerHTML(),
+      link: await linkElement?.getAttribute("href") ?? undefined,
     };
-  });
+  }));
 
   return {
     title: config.title,
