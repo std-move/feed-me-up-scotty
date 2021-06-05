@@ -56,6 +56,8 @@ type FeedData = {
 };
 
 async function generateFeed(config: FeedConfig): Promise<FeedData> {
+  const url = new URL(config.url);
+  const origin = url.origin;
   const browser = await getBrowser();
   const context = await browser.newContext();
   const page = await context.newPage();
@@ -64,10 +66,14 @@ async function generateFeed(config: FeedConfig): Promise<FeedData> {
   const entries: FeedData['elements'] = await Promise.all(entriesElements.map(async entryElement => {
     const titleElement = await entryElement.$(config.titleSelector);
     const linkElement = await entryElement.$(config.linkSelector);
+    const linkValue = await linkElement?.getAttribute("href");
+    const normalisedLink = linkValue
+      ? (new URL(linkValue, origin).href)
+      : undefined;
     return {
       title: await titleElement?.textContent() ?? undefined,
       contents: await entryElement.innerHTML(),
-      link: await linkElement?.getAttribute("href") ?? undefined,
+      link: normalisedLink,
     };
   }));
 
