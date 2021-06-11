@@ -10,6 +10,7 @@
   "author": "",
   "license": "AGPL-3.0",
   "dependencies": {
+    "@ltd/j-toml": "^1.12.2",
     "feed": "^4.2.2",
     "playwright-firefox": "^1.11.1"
   },

@@ -1,26 +1,9 @@
 import { Browser, firefox } from "playwright-firefox";
 import { Feed } from "feed";
-import { writeFile, mkdir } from "fs/promises";
+import { writeFile, mkdir, readFile } from "fs/promises";
 import fetch from "node-fetch";
 import { URL } from "url";
-
-type FeedConfig = {
-  url: string;
-  title: string;
-  entrySelector: string;
-  titleSelector: string;
-  linkSelector: string;
-};
-
-const feedConfigs: FeedConfig[] = [
-  {
-    url: "https://en.wikipedia.org/wiki/Main_Page",
-    entrySelector: "#mp-dyk > ul li",
-    titleSelector: "b",
-    linkSelector: "b a",
-    title: "Wikipedia — did you know?",
-  },
-];
+import { parse } from "@ltd/j-toml";
 
 run();
 let browser: Browser;
@@ -37,6 +20,7 @@ async function getBrowser() {
 }
 
 async function run() {
+  const feedConfigs = await loadFeedConfigs();
   const feedsData = await Promise.all(feedConfigs.map(generateFeed));
   const combinedFeedData = combineFeedData(feedsData);
   const combinedFeedDataWithDates = await reconcileDates(combinedFeedData);
@@ -47,6 +31,33 @@ async function run() {
   const browser = await getBrowser();
   await browser.close();
   console.log("Feed generated at public/feed.xml");
+}
+
+type FeedConfig = {
+  id: string;
+  url: string;
+  title: string;
+  entrySelector: string;
+  titleSelector: string;
+  linkSelector: string;
+};
+
+async function loadFeedConfigs(): Promise<FeedConfig[]> {
+  const configFile = await readFile("./feeds.toml", "utf-8");
+  const parsed = parse(configFile, 1.0, "\n");
+
+  const feedIds = Object.keys(parsed);
+  return feedIds.map(feedId => {
+    const feedToml = parsed[feedId] as FeedConfig;
+    return {
+      id: feedId,
+      title: feedToml.title ?? feedId,
+      entrySelector: feedToml.entrySelector,
+      titleSelector: feedToml.titleSelector,
+      linkSelector: feedToml.linkSelector,
+      url: feedToml.url,
+    };
+  });
 }
 
 type FeedData = {
