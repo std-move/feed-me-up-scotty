@@ -116,7 +116,7 @@ function combineFeedData(feedsData: FeedData[]): FeedData {
   const elements = feedsData.reduce((soFar, feedData) => soFar.concat(feedData.elements), [] as FeedData['elements']);
   return {
     title: "Combined feed",
-    url: "https://example.com",
+    url: (getRootUrl() ?? "https://example.com/") + "all.xml",
     elements: elements,
   };
 }
@@ -140,10 +140,11 @@ function toFeed(feedData: FeedData): string {
 }
 
 async function reconcileDates(feedId: string, feedData: FeedData): Promise<FeedData> {
-  if (typeof process.env.CI_PAGES_URL !== "string") {
+  const rootUrl = getRootUrl();
+  if (typeof rootUrl !== "string") {
     return feedData;
   }
-  const response = await fetch(`${process.env.CI_PAGES_URL}${feedId}.json`);
+  const response = await fetch(`${rootUrl}${feedId}.json`);
   if (!response.ok) {
     return feedData;
   }
@@ -165,4 +166,8 @@ async function reconcileDates(feedId: string, feedData: FeedData): Promise<FeedD
     ...feedData,
     elements: newElements,
   };
+}
+
+function getRootUrl(): string | undefined {
+  return process.env.CI_PAGES_URL;
 }
