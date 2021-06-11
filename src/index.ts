@@ -21,16 +21,27 @@ async function getBrowser() {
 
 async function run() {
   const feedConfigs = await loadFeedConfigs();
-  const feedsData = await Promise.all(feedConfigs.map(generateFeed));
+  const feedsData = await Promise.all(feedConfigs.map(fetchFeedData));
+  const individualFeedPromises = feedsData.map((feedData, i) => generateFeed(feedConfigs[i].id, feedData));
+
+
   const combinedFeedData = combineFeedData(feedsData);
-  const combinedFeedDataWithDates = await reconcileDates(combinedFeedData);
-  const feed = await toFeed(combinedFeedDataWithDates);
-  await mkdir("public").catch(() => console.log("Directory `public` already exists; continuing."));
-  await writeFile("public/feed.xml", feed, "utf-8");
-  await writeFile("public/feeddata.json", JSON.stringify(combinedFeedDataWithDates), "utf-8");
+  const combinedFeedDataWithDates = await reconcileDates("all", combinedFeedData);
+  await generateFeed("all", combinedFeedDataWithDates);
+
   const browser = await getBrowser();
   await browser.close();
-  console.log("Feed generated at public/feed.xml");
+  console.log("Feeds generated in `public/`.");
+}
+
+async function generateFeed(feedId: string, feedData: FeedData) {
+  const feedDataWithDates = await reconcileDates(feedId, feedData);
+  const feed = await toFeed(feedDataWithDates);
+  await mkdir("public").catch(() => {
+    // Directory `public` already exists; continuing.
+  });
+  await writeFile(`public/${feedId}.xml`, feed, "utf-8");
+  await writeFile(`public/${feedId}.json`, JSON.stringify(feedDataWithDates), "utf-8");
 }
 
 type FeedConfig = {
@@ -71,7 +82,7 @@ type FeedData = {
   }>;
 };
 
-async function generateFeed(config: FeedConfig): Promise<FeedData> {
+async function fetchFeedData(config: FeedConfig): Promise<FeedData> {
   const url = new URL(config.url);
   const origin = url.origin;
   const browser = await getBrowser();
@@ -128,11 +139,11 @@ function toFeed(feedData: FeedData): string {
   return feed.atom1();
 }
 
-async function reconcileDates(feedData: FeedData): Promise<FeedData> {
+async function reconcileDates(feedId: string, feedData: FeedData): Promise<FeedData> {
   if (typeof process.env.CI_PAGES_URL !== "string") {
     return feedData;
   }
-  const response = await fetch(process.env.CI_PAGES_URL + "feeddata.json");
+  const response = await fetch(`${process.env.CI_PAGES_URL}${feedId}.json`);
   if (!response.ok) {
     return feedData;
   }
