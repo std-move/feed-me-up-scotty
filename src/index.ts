@@ -32,6 +32,13 @@ async function run() {
   const browser = await getBrowser();
   await browser.close();
   console.log("Feeds generated in `public/`.");
+  if (typeof getRootUrl() === "string") {
+    console.log("\nThey will be published at:");
+    feedConfigs.forEach(feedConfig => {
+      console.log(`- ${getRootUrl()}${feedConfig.id}.xml`);
+    });
+    console.log(`\nA combined feed is available at:\n\t${getRootUrl()}all.xml`);
+  }
 }
 
 async function generateFeed(feedId: string, feedData: FeedData) {
