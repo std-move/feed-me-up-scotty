@@ -175,5 +175,12 @@ async function reconcileDates(feedId: string, feedData: FeedData): Promise<FeedD
 }
 
 function getRootUrl(): string | undefined {
-  return process.env.CI_PAGES_URL;
+  const rootUrl = process.env.CI_PAGES_URL;
+  if (typeof rootUrl !== "string") {
+    return rootUrl;
+  }
+  const rootUrlWithTrailingSlash = rootUrl.endsWith("/")
+    ? rootUrl
+    : rootUrl + "/";
+  return rootUrlWithTrailingSlash;
 }
