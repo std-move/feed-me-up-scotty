@@ -25,8 +25,7 @@ async function run() {
   const individualFeedPromises = feedsData.map((feedData, i) => generateFeed(feedConfigs[i].id, feedData));
 
   const combinedFeedData = combineFeedData(feedsData);
-  const combinedFeedDataWithDates = await reconcileDates("all", combinedFeedData);
-  await generateFeed("all", combinedFeedDataWithDates);
+  await generateFeed("all", combinedFeedData);
   await Promise.all(individualFeedPromises);
 
   const browser = await getBrowser();
