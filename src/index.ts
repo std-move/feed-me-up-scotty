@@ -119,7 +119,12 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData> {
 }
 
 function combineFeedData(feedsData: FeedData[]): FeedData {
-  const elements = feedsData.reduce((soFar, feedData) => soFar.concat(feedData.elements), [] as FeedData['elements']);
+  const elements = feedsData.reduce(
+    (soFar, feedData) => soFar.concat(
+      feedData.elements.map(element => ({ ...element, title: element.title + ` (${feedData.title})` })
+    )),
+    [] as FeedData['elements']
+  );
   return {
     title: "Combined feed",
     url: (getRootUrl() ?? "https://example.com/") + "all.xml",
