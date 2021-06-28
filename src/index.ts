@@ -94,7 +94,7 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData> {
   const browser = await getBrowser();
   const context = await browser.newContext();
   const page = await context.newPage();
-  await page.goto(config.url);
+  await page.goto(config.url, { timeout: 60 * 1000 });
   const entriesElements = await page.$$(config.entrySelector);
   const entries: FeedData['elements'] = await Promise.all(entriesElements.map(async entryElement => {
     const titleElement = await entryElement.$(config.titleSelector);
