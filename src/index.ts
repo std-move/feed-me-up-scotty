@@ -57,6 +57,7 @@ type FeedConfig = {
   entrySelector: string;
   titleSelector: string;
   linkSelector: string;
+  filters?: string[];
 };
 
 async function loadFeedConfigs(): Promise<FeedConfig[]> {
@@ -65,7 +66,7 @@ async function loadFeedConfigs(): Promise<FeedConfig[]> {
 
   const feedIds = Object.keys(parsed);
   return feedIds.map(feedId => {
-    const feedToml = parsed[feedId] as FeedConfig;
+    const feedToml = parsed[feedId] as unknown as FeedConfig;
     return {
       id: feedId,
       title: feedToml.title ?? feedId,
@@ -73,6 +74,7 @@ async function loadFeedConfigs(): Promise<FeedConfig[]> {
       titleSelector: feedToml.titleSelector,
       linkSelector: feedToml.linkSelector,
       url: feedToml.url,
+      filters: feedToml.filters,
     };
   });
 }
@@ -111,10 +113,15 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData> {
     };
   }));
 
+  const filters = config.filters;
+  const filteredEntries = Array.isArray(filters)
+    ? entries.filter(entry => filters.every(filter => !entry.contents.toLowerCase().includes(filter.toLowerCase())))
+    : entries;
+
   return {
     title: config.title,
     url: config.url,
-    elements: entries,
+    elements: filteredEntries,
   };
 }
 
