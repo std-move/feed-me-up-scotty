@@ -189,7 +189,7 @@ async function reconcileDates(feedId: string, feedData: FeedData): Promise<FeedD
 }
 
 function getRootUrl(): string | undefined {
-  const rootUrl = process.env.CI_PAGES_URL;
+  const rootUrl = process.env.CI_PAGES_URL ?? getGithubPagesUrl();
   if (typeof rootUrl !== "string") {
     return rootUrl;
   }
@@ -197,4 +197,14 @@ function getRootUrl(): string | undefined {
     ? rootUrl
     : rootUrl + "/";
   return rootUrlWithTrailingSlash;
+}
+
+function getGithubPagesUrl(): string | undefined {
+  const repositorySlug = process.env.GITHUB_REPOSITORY;
+  if (typeof repositorySlug !== "string" || !repositorySlug.includes("/")) {
+    return;
+  }
+
+  const [owner, repository] = repositorySlug.split("/");
+  return `https://${owner}.github.io/${repository}/`;
 }
