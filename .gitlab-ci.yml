@@ -1,14 +1,15 @@
+include:
+  - project: 'vincenttunru/ci-templates'
+    file: '/npm-node12.gitlab-ci.yml'
 image: node:14
 
-pages:
-  stage: deploy
-  image: mcr.microsoft.com/playwright:focal
+build:
+  stage: build
   script:
   - npm ci
-  - npm start
-  artifacts:
-    paths:
-    - public
-    expire_in: 1 day
-  only:
-  - main
+  - npm run build
+
+test:
+  stage: test
+  script:
+    - npm test
