@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { Browser, firefox } from "playwright-firefox";
 import { Feed } from "feed";
 import { writeFile, mkdir, readFile } from "fs/promises";
@@ -6,6 +7,7 @@ import { URL } from "url";
 import { parse } from "@ltd/j-toml";
 
 run();
+
 let browser: Browser;
 let browsePromise: Promise<Browser>;
 async function getBrowser() {
