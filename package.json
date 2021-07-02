@@ -1,12 +1,14 @@
 {
-  "name": "runo",
+  "name": "feed-me-up-scotty",
   "version": "0.0.1",
   "description": "",
   "main": "src/index.ts",
+  "bin": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
     "start": "node --require ts-node/register --unhandled-rejections=strict src/index.ts"
   },
+  "type": "module",
   "author": "",
   "license": "AGPL-3.0",
   "dependencies": {
@@ -15,6 +17,7 @@
     "playwright-firefox": "^1.11.1"
   },
   "devDependencies": {
+    "@tsconfig/node12": "^1.0.9",
     "@types/jsdom": "^16.2.10",
     "@types/node": "^15.12.2",
     "@types/node-fetch": "^2.5.10",
