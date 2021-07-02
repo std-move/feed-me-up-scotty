@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { Browser, firefox } from "playwright-firefox";
 import { Feed } from "feed";
 import { writeFile, mkdir, readFile } from "fs/promises";
