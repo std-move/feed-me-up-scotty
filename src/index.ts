@@ -55,7 +55,7 @@ async function generateFeed(feedId: string, feedData: FeedData) {
 type FeedConfig = {
   id: string;
   url: string;
-  title: string;
+  title?: string;
   entrySelector: string;
   titleSelector: string;
   linkSelector: string;
@@ -121,7 +121,7 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData> {
     : entries;
 
   return {
-    title: config.title,
+    title: config.title ?? config.id,
     url: config.url,
     elements: filteredEntries,
   };
