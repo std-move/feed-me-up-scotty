@@ -1,6 +1,9 @@
 include:
   - project: 'vincenttunru/ci-templates'
     file: '/npm-node12.gitlab-ci.yml'
+  - project: 'vincenttunru/ci-templates'
+    file: '/spa.gitlab-ci.yml'
+
 image: node:14
 
 build:
@@ -9,7 +12,33 @@ build:
   - npm ci
   - npm run build
 
+build_website:
+  image: node:14
+  stage: build
+  script:
+  - cd website
+  - npm ci
+  - npm run build
+  artifacts:
+    paths:
+    - website/node_modules
+    - website/build
+
 test:
   stage: test
   script:
     - npm test
+
+deploy_website:
+  image: python:3
+  stage: release
+  dependencies:
+  - build_website
+  script:
+  - export BUCKET="s3://$CI_PROJECT_NAME.vincenttunru.com"
+  - pip3 install awscli --upgrade
+  - aws s3 website $BUCKET --index-document index.html --error-document index.html
+  - aws s3 sync website/build $BUCKET
+  only:
+  - master
+  - main
