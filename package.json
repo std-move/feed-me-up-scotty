@@ -1,7 +1,7 @@
 {
   "name": "feed-me-up-scotty",
   "version": "1.0.0",
-  "description": "",
+  "description": "RSS feeds for arbitrary websites, using CSS selectors",
   "main": "src/index.ts",
   "bin": "dist/index.js",
   "scripts": {
