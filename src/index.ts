@@ -55,7 +55,7 @@ async function generateFeed(feedId: string, feedData: FeedData) {
 type FeedConfig = {
   id: string;
   url: string;
-  title: string;
+  title?: string;
   entrySelector: string;
   titleSelector: string;
   linkSelector: string;
