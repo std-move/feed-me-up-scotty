@@ -1,6 +1,9 @@
 include:
   - project: 'vincenttunru/ci-templates'
     file: '/npm-node12.gitlab-ci.yml'
+  - project: 'vincenttunru/ci-templates'
+    file: '/spa.gitlab-ci.yml'
+
 image: node:14
 
 build:
@@ -8,6 +11,19 @@ build:
   script:
   - npm ci
   - npm run build
+
+build_website:
+  image: node:14
+  stage: build
+  script:
+  - cd website
+  - npm ci
+  - npm run build
+  - mv build ../out
+  artifacts:
+    paths:
+    - website/node_modules
+    - out
 
 test:
   stage: test
