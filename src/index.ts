@@ -117,7 +117,7 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData> {
 
   const filters = config.filters;
   const filteredEntries = Array.isArray(filters)
-    ? entries.filter(entry => filters.every(filter => !entry.contents.toLowerCase().includes(filter.toLowerCase())))
+    ? entries.filter(entry => filters.every(filter => !entry.contents.includes(filter)))
     : entries;
 
   return {
