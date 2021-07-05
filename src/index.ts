@@ -120,10 +120,15 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData> {
     ? entries.filter(entry => filters.every(filter => !entry.contents.includes(filter)))
     : entries;
 
+  const entriesWithBaseUrl = filteredEntries.map(entry => ({
+    ...entry,
+    contents: `<base href=${origin}>${entry.contents}`,
+  }));
+
   return {
     title: config.title ?? config.id,
     url: config.url,
-    elements: filteredEntries,
+    elements: entriesWithBaseUrl,
   };
 }
 
