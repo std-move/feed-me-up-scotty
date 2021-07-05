@@ -34,3 +34,25 @@ resulting feed using GitLab Pages.
 GitLab CI/CD will then automatically run at your selected interval to check for
 updates, and publish your feeds at
 `https://<username>.gitlab.io/feeds/<feedname>.xml`.
+
+## Elsewhere
+
+To generate feeds with _Feed me up, Scotty!_ you need:
+
+1. A place to run (Node.js) code on a schedule.
+2. A place to publish the resulting feeds.
+
+Feeds can be generated on machines that have a recent version of Node.js
+installed by running:
+
+```bash
+npx feed-me-up-scotty
+```
+
+This will read the configuration file from `feeds.toml`, and create a folder
+`public/` containing the generated RSS feeds for you to publish.
+
+If you set an environment variable `$CI_PAGES_URL` with the base URL where you
+are publishing the feeds (e.g. `https://vincenttunru.gitlab.io/feeds/`), then
+_Feed me up, Scotty!_ will fetch the feed data in advance and set the correct
+publication date for the feed entries.
