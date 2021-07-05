@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "test": "echo \"Error: no test specified\"",
-    "start": "node --require ts-node/register --unhandled-rejections=strict src/index.ts"
+    "start": "node --loader ts-node/esm --unhandled-rejections=strict src/index.ts"
   },
   "type": "module",
   "author": "",
