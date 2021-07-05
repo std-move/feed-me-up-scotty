@@ -19,7 +19,7 @@ linkSelector = "b a"
 title = "Wikivoyage recommendations"
 url = "https://en.wikivoyage.org/wiki/Main_Page"
 entrySelector = ".jcarousel-wrapper .jcarousel-item"
-titleSelector = "h2
+titleSelector = "h2"
 linkSelector = "h2 a"
 ```
 
