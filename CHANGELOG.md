@@ -6,6 +6,10 @@ The following changes have been implemented but not released yet:
 
 ## [Unreleased]
 
+### New features
+
+- RSS feeds now include the favicon of the page they were fetched from.
+
 The following sections document changes that have been released already:
 
 ## [1.0.0] - 2021-07-02

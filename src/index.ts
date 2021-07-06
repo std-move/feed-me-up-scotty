@@ -84,6 +84,7 @@ async function loadFeedConfigs(): Promise<FeedConfig[]> {
 type FeedData = {
   title: string;
   url: string;
+  favicon?: string;
   elements: Array<{
     title?: string;
     contents: string;
@@ -99,6 +100,11 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData> {
   const context = await browser.newContext();
   const page = await context.newPage();
   await page.goto(config.url, { timeout: 60 * 1000 });
+  const faviconElement = await page.$("link[rel='icon']");
+  const faviconPath = faviconElement
+    ? await faviconElement.getAttribute("href") ?? "favicon.ico"
+    : "favicon.ico";
+  const faviconUrl = (new URL(faviconPath, origin)).href;
   const entriesElements = await page.$$(config.entrySelector);
   const entries: FeedData['elements'] = await Promise.all(entriesElements.map(async entryElement => {
     const titleElement = await entryElement.$(config.titleSelector);
@@ -123,6 +129,7 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData> {
   return {
     title: config.title ?? config.id,
     url: config.url,
+    favicon: faviconUrl,
     elements: filteredEntries,
   };
 }
@@ -146,6 +153,7 @@ function toFeed(feedData: FeedData): string {
     title: feedData.title,
     id: feedData.url,
     copyright: "",
+    favicon: feedData.favicon,
   });
   feedData.elements.forEach((element, i) => {
     feed.addItem({
