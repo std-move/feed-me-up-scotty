@@ -99,7 +99,7 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData> {
   const browser = await getBrowser();
   const context = await browser.newContext();
   const page = await context.newPage();
-  await page.goto(config.url, { timeout: 60 * 1000 });
+  await page.goto(config.url, { timeout: 60 * 1000, waitUntil: "networkidle" });
   const faviconElement = await page.$("link[rel='icon']");
   const faviconPath = faviconElement
     ? await faviconElement.getAttribute("href") ?? "favicon.ico"

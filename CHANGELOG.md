@@ -9,6 +9,8 @@ The following changes have been implemented but not released yet:
 ### New features
 
 - RSS feeds now include the favicon of the page they were fetched from.
+- Pages are now only considered fully loaded when they're no longer performing
+  network requests.
 
 The following sections document changes that have been released already:
 
