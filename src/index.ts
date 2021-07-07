@@ -59,6 +59,7 @@ type FeedConfig = {
   entrySelector: string;
   titleSelector: string;
   linkSelector: string;
+  contentSelector?: string;
   filters?: string[];
 };
 
@@ -75,6 +76,7 @@ async function loadFeedConfigs(): Promise<FeedConfig[]> {
       entrySelector: feedToml.entrySelector,
       titleSelector: feedToml.titleSelector,
       linkSelector: feedToml.linkSelector,
+      contentSelector: feedToml.contentSelector,
       url: feedToml.url,
       filters: feedToml.filters,
     };
@@ -113,9 +115,12 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData> {
     const normalisedLink = linkValue
       ? (new URL(linkValue, origin).href)
       : undefined;
+    const contentElement = typeof config.contentSelector === "string"
+      ? await entryElement.$(config.contentSelector) ?? entryElement
+      : entryElement;
     return {
       title: await titleElement?.textContent() ?? undefined,
-      contents: await entryElement.innerHTML(),
+      contents: await contentElement.innerHTML(),
       link: normalisedLink,
       retrieved: Date.now(),
     };

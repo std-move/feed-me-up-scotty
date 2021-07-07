@@ -6,6 +6,11 @@ The following changes have been implemented but not released yet:
 
 ## [Unreleased]
 
+### New features
+
+- An optional `contentSelector` can now be set to use a subset of an entry as
+  its content.
+
 The following sections document changes that have been released already:
 
 ## [1.1.0] - 2021-07-06

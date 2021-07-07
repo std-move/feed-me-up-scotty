@@ -75,6 +75,16 @@ Selector](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Sel
 matching the `<a>` element inside individual feed entries containing the link
 to view that entry in your browser. For example, `a.permalink`.
 
+## `contentSelector`
+
+Optional, [string](https://toml.io/en/v1.0.0#string).
+
+[CSS
+Selector](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Selectors)
+matching the element inside individual feed entries containing that entry's
+content. For example, `p.lead`. If not provided, the entry as a whole will be
+used as the content.
+
 ## `filters`
 
 Optional, [array](https://toml.io/en/v1.0.0#array) of
