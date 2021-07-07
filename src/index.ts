@@ -119,8 +119,8 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData> {
       ? await entryElement.$(config.contentSelector) ?? entryElement
       : entryElement;
     return {
-      title: await titleElement?.textContent() ?? undefined,
-      contents: await contentElement.innerHTML(),
+      title: (await titleElement?.textContent())?.trim() ?? undefined,
+      contents: (await contentElement.innerHTML()).trim(),
       link: normalisedLink,
       retrieved: Date.now(),
     };
