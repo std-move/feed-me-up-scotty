@@ -6,14 +6,16 @@ The following changes have been implemented but not released yet:
 
 ## [Unreleased]
 
+The following sections document changes that have been released already:
+
+## [1.2.0] - 2021-07-07
+
 ### New features
 
 - An optional `contentSelector` can now be set to use a subset of an entry as
   its content.
 - You can now pass multiple URLs for a single feed, to support e.g. pagination.
 - You can set a custom timeout per feed.
-
-The following sections document changes that have been released already:
 
 ## [1.1.0] - 2021-07-06
 
