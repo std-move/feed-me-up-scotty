@@ -61,11 +61,12 @@ type FeedConfig = {
   linkSelector: string;
   contentSelector?: string;
   filters?: string[];
+  timeout?: number;
 };
 
 async function loadFeedConfigs(): Promise<FeedConfig[]> {
   const configFile = await readFile("./feeds.toml", "utf-8");
-  const parsed = parse(configFile, 1.0, "\n");
+  const parsed = parse(configFile, 1.0, "\n", false);
 
   const feedIds = Object.keys(parsed);
   return feedIds.map(feedId => {
@@ -79,6 +80,7 @@ async function loadFeedConfigs(): Promise<FeedConfig[]> {
       contentSelector: feedToml.contentSelector,
       url: feedToml.url,
       filters: feedToml.filters,
+      timeout: feedToml.timeout,
     };
   });
 }
@@ -102,7 +104,7 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData> {
   const browser = await getBrowser();
   const context = await browser.newContext();
   const page = await context.newPage();
-  await page.goto(firstUrl, { timeout: 60 * 1000, waitUntil: "networkidle" });
+  await page.goto(firstUrl, { timeout: (config.timeout ?? 60) * 1000, waitUntil: "networkidle" });
   const faviconElement = await page.$("link[rel='icon']");
   const faviconPath = faviconElement
     ? await faviconElement.getAttribute("href") ?? "favicon.ico"
@@ -129,7 +131,7 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData> {
 }
 
 async function fetchPageEntries(page: Page, url: string, origin: string, config: FeedConfig): Promise<FeedData['elements']> {
-  await page.goto(url, { timeout: 60 * 1000, waitUntil: "networkidle" });
+  await page.goto(url, { timeout: (config.timeout ?? 60) * 1000, waitUntil: "networkidle" });
   const entriesElements = await page.$$(config.entrySelector);
   const entries: FeedData['elements'] = await Promise.all(entriesElements.map(async entryElement => {
     const titleElement = await entryElement.$(config.titleSelector);

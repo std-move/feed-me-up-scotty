@@ -88,6 +88,12 @@ matching the element inside individual feed entries containing that entry's
 content. For example, `p.lead`. If not provided, the entry as a whole will be
 used as the content.
 
+## `timeout`
+
+Optional, [integer](https://toml.io/en/v1.0.0#integer).
+
+Number of seconds to wait for the given page to load. Defaults to 60.
+
 ## `filters`
 
 Optional, [array](https://toml.io/en/v1.0.0#array) of
