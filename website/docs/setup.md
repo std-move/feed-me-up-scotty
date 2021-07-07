@@ -48,6 +48,9 @@ Required, [string](https://toml.io/en/v1.0.0#string).
 
 URL of which to generate an RSS feed.
 
+You can also pass an array of strings, e.g. to concatenate contents of multiple
+pages into a single RSS feed.
+
 ## `entrySelector`
 
 Required, [string](https://toml.io/en/v1.0.0#string).

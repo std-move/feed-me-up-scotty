@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { Browser, firefox } from "playwright-firefox";
+import { Browser, firefox, Page } from "playwright-firefox";
 import { Feed } from "feed";
 import { writeFile, mkdir, readFile } from "fs/promises";
 import fetch from "node-fetch";
@@ -54,7 +54,7 @@ async function generateFeed(feedId: string, feedData: FeedData) {
 
 type FeedConfig = {
   id: string;
-  url: string;
+  url: string | string[];
   title?: string;
   entrySelector: string;
   titleSelector: string;
@@ -96,17 +96,40 @@ type FeedData = {
 };
 
 async function fetchFeedData(config: FeedConfig): Promise<FeedData> {
-  const url = new URL(config.url);
+  const firstUrl = Array.isArray(config.url) ? config.url[0] : config.url;
+  const url = new URL(firstUrl);
   const origin = url.origin;
   const browser = await getBrowser();
   const context = await browser.newContext();
   const page = await context.newPage();
-  await page.goto(config.url, { timeout: 60 * 1000, waitUntil: "networkidle" });
+  await page.goto(firstUrl, { timeout: 60 * 1000, waitUntil: "networkidle" });
   const faviconElement = await page.$("link[rel='icon']");
   const faviconPath = faviconElement
     ? await faviconElement.getAttribute("href") ?? "favicon.ico"
     : "favicon.ico";
   const faviconUrl = (new URL(faviconPath, origin)).href;
+  const allUrls = Array.isArray(config.url) ? config.url : [config.url];
+  const entries = await allUrls.reduce(async (accPromise, url) => {
+    const acc = await accPromise;
+    const pageEntries = await fetchPageEntries(page, url, origin, config);
+    return acc.concat(pageEntries);
+  }, Promise.resolve([] as FeedData['elements']));
+
+  const filters = config.filters;
+  const filteredEntries = Array.isArray(filters)
+    ? entries.filter(entry => filters.every(filter => !entry.contents.includes(filter)))
+    : entries;
+
+  return {
+    title: config.title ?? config.id,
+    url: firstUrl,
+    favicon: faviconUrl,
+    elements: filteredEntries,
+  };
+}
+
+async function fetchPageEntries(page: Page, url: string, origin: string, config: FeedConfig): Promise<FeedData['elements']> {
+  await page.goto(url, { timeout: 60 * 1000, waitUntil: "networkidle" });
   const entriesElements = await page.$$(config.entrySelector);
   const entries: FeedData['elements'] = await Promise.all(entriesElements.map(async entryElement => {
     const titleElement = await entryElement.$(config.titleSelector);
@@ -126,17 +149,7 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData> {
     };
   }));
 
-  const filters = config.filters;
-  const filteredEntries = Array.isArray(filters)
-    ? entries.filter(entry => filters.every(filter => !entry.contents.includes(filter)))
-    : entries;
-
-  return {
-    title: config.title ?? config.id,
-    url: config.url,
-    favicon: faviconUrl,
-    elements: filteredEntries,
-  };
+  return entries;
 }
 
 function combineFeedData(feedsData: FeedData[]): FeedData {
