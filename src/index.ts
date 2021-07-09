@@ -67,20 +67,17 @@ type FeedConfig = {
 async function loadFeedConfigs(): Promise<FeedConfig[]> {
   const configFile = await readFile("./feeds.toml", "utf-8");
   const parsed = parse(configFile, 1.0, "\n", false);
+  const defaultSettingsId = "default";
 
-  const feedIds = Object.keys(parsed);
+  const feedIds = Object.keys(parsed).filter(feedId => feedId !== defaultSettingsId);
+  const defaultConfig: Partial<FeedConfig> = parsed[defaultSettingsId] as unknown as Partial<FeedConfig> ?? {};
   return feedIds.map(feedId => {
     const feedToml = parsed[feedId] as unknown as FeedConfig;
     return {
+      ...defaultConfig,
+      ...feedToml,
+      title: feedToml.title ?? defaultConfig.title ?? feedId,
       id: feedId,
-      title: feedToml.title ?? feedId,
-      entrySelector: feedToml.entrySelector,
-      titleSelector: feedToml.titleSelector,
-      linkSelector: feedToml.linkSelector,
-      contentSelector: feedToml.contentSelector,
-      url: feedToml.url,
-      filters: feedToml.filters,
-      timeout: feedToml.timeout,
     };
   });
 }

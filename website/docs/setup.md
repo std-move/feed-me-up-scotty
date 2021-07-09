@@ -8,6 +8,9 @@ _Feed me up, Scotty!_ is configured by creating a [TOML](https://toml.io) file
 called `feeds.toml`. Example:
 
 ```toml title=feeds.toml
+[default]
+timeout = 30
+
 [funfacts]
 title = "Wikipedia — did you know?"
 url = "https://en.wikipedia.org/wiki/Main_Page"
@@ -35,6 +38,11 @@ configuration above would generate the feeds `funfacts.xml` and
 
 Additionally, a single feed combining all the posts from the other feeds will be
 generated in `all.xml`.
+
+Adding the below options to a table labelled `default` sets the given value for
+every feed configuration that does not specify a value for that option itself.
+For example, the configuration above would time out if the two source pages do
+not load within 30 seconds.
 
 ## `title`
 

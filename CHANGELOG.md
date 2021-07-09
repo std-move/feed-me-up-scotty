@@ -6,6 +6,13 @@ The following changes have been implemented but not released yet:
 
 ## [Unreleased]
 
+### New features
+
+- By adding a [table](https://toml.io/en/v1.0.0#table) called `default`, you can
+  now set default feed options that will be used for feed configurations that do
+  not have those options defined themselves. For example, you can use this to
+  increase the default `timeout`.
+
 The following sections document changes that have been released already:
 
 ## [1.2.0] - 2021-07-07
