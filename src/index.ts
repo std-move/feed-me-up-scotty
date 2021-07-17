@@ -218,6 +218,11 @@ function toFeed(feedData: FeedData): string {
     });
   });
 
+  if (feedData.elements.some(element => typeof element.image === "string")) {
+    // Atom feeds don't support entry images:
+    return feed.rss2();
+  }
+
   return feed.atom1();
 }
 
