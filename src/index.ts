@@ -60,6 +60,7 @@ type FeedConfig = {
   titleSelector: string;
   linkSelector: string;
   contentSelector?: string;
+  imageSelector?: string;
   filters?: string[];
   timeout?: number;
   /** This option is experimental, and may be removed at any time: */
@@ -93,6 +94,7 @@ type FeedData = {
     contents: string;
     link?: string;
     retrieved: number;
+    image?: string;
   }>;
 };
 
@@ -134,19 +136,51 @@ async function fetchPageEntries(page: Page, url: string, origin: string, config:
   const entriesElements = await page.$$(config.entrySelector);
   const entries: FeedData['elements'] = await Promise.all(entriesElements.map(async entryElement => {
     const titleElement = await entryElement.$(config.titleSelector);
+
     const linkElement = await entryElement.$(config.linkSelector);
     const linkValue = await linkElement?.getAttribute("href");
     const normalisedLink = linkValue
       ? (new URL(linkValue, origin).href)
       : undefined;
+
     const contentElement = typeof config.contentSelector === "string"
       ? await entryElement.$(config.contentSelector) ?? entryElement
       : entryElement;
+
+    const imageElement = typeof config.imageSelector === "string"
+      ? await entryElement.$(config.imageSelector)
+      : undefined;
+    let imageUrl = await imageElement?.getAttribute("src");
+    try {
+      if (config.imageSelector && typeof imageUrl !== "string") {
+        const backgroundImageValue = await entryElement.$eval(config.imageSelector, (el) => el.style["background-image"]);
+        if (
+          typeof backgroundImageValue === "string" &&
+          backgroundImageValue.substring(0, "url(".length) === "url(" &&
+          backgroundImageValue.charAt(backgroundImageValue.length - 1) === ")"
+        ) {
+          const urlValue = backgroundImageValue.substring("url(".length, backgroundImageValue.length - 1);
+          const urlValueWithoutQuotes = (urlValue.charAt(0) === '"' || urlValue.charAt(0) === "'")
+            ? urlValue.substring(1, urlValue.length - 1)
+            : urlValue;
+          const url = new URL(urlValueWithoutQuotes);
+          imageUrl = url.href;
+        }
+      }
+    } catch(e) {
+      // No image element found, or not in a URL format we understand.
+      // Skip the image.
+    }
+    const normalisedImgSrc = imageUrl
+      ? (new URL(imageUrl, origin).href)
+      : undefined;
+
     return {
       title: (await titleElement?.textContent())?.trim() ?? undefined,
       contents: (await contentElement.innerHTML()).trim(),
       link: normalisedLink,
       retrieved: Date.now(),
+      image: normalisedImgSrc,
     };
   }));
 
@@ -180,6 +214,7 @@ function toFeed(feedData: FeedData): string {
       link: element.link ?? feedData.url,
       content: element.contents,
       date: new Date(element.retrieved),
+      image: element.image,
     });
   });
 
