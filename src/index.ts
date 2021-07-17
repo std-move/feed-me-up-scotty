@@ -105,7 +105,7 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData> {
   const browser = await getBrowser();
   const context = await browser.newContext();
   const page = await context.newPage();
-  await page.goto(firstUrl, { timeout: (config.timeout ?? 60) * 1000, waitUntil: config.waitUntil ?? "domcontentloaded" });
+  await page.goto(firstUrl, { timeout: (config.timeout ?? 60) * 1000, waitUntil: config.waitUntil ?? "networkidle" });
   const faviconElement = await page.$("link[rel='icon']");
   const faviconPath = faviconElement
     ? await faviconElement.getAttribute("href") ?? "favicon.ico"
@@ -132,7 +132,7 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData> {
 }
 
 async function fetchPageEntries(page: Page, url: string, origin: string, config: FeedConfig): Promise<FeedData['elements']> {
-  await page.goto(url, { timeout: (config.timeout ?? 60) * 1000, waitUntil: config.waitUntil ?? "domcontentloaded" });
+  await page.goto(url, { timeout: (config.timeout ?? 60) * 1000, waitUntil: config.waitUntil ?? "networkidle" });
   const entriesElements = await page.$$(config.entrySelector);
   const entries: FeedData['elements'] = await Promise.all(entriesElements.map(async entryElement => {
     const titleElement = await entryElement.$(config.titleSelector);
