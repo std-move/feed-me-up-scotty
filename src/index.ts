@@ -145,7 +145,9 @@ async function fetchPageEntries(page: Page, url: string, origin: string, config:
   const entries: FeedData['elements'] = await Promise.all(entriesElements.map(async entryElement => {
     const titleElement = await entryElement.$(config.titleSelector);
 
-    const linkElement = await entryElement.$(config.linkSelector);
+    const linkElement = config.linkSelector === "*"
+      ? entryElement
+      : await entryElement.$(config.linkSelector);
     const linkValue = await linkElement?.getAttribute("href");
     const normalisedLink = linkValue
       ? (new URL(linkValue, origin).href)

@@ -86,6 +86,9 @@ Selector](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Sel
 matching the `<a>` element inside individual feed entries containing the link
 to view that entry in your browser. For example, `a.permalink`.
 
+Set it to `*` if the link is to be found on the element matched by
+`entrySelector`.
+
 ## `contentSelector`
 
 Optional, [string](https://toml.io/en/v1.0.0#string).
