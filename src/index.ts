@@ -64,6 +64,8 @@ type FeedConfig = {
   filters?: string[];
   timeout?: number;
   /** This option is experimental, and may be removed at any time: */
+  waitForSelector?: string;
+  /** This option is experimental, and may be removed at any time: */
   waitUntil?: NonNullable<Parameters<Page['goto']>[1]>['waitUntil'];
 };
 
@@ -105,7 +107,10 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData> {
   const browser = await getBrowser();
   const context = await browser.newContext();
   const page = await context.newPage();
-  await page.goto(firstUrl, { timeout: (config.timeout ?? 60) * 1000, waitUntil: config.waitUntil ?? "networkidle" });
+  await page.goto(firstUrl, { timeout: (config.timeout ?? 60) * 1000, waitUntil: config.waitUntil ?? "domcontentloaded" });
+  if(typeof config.waitForSelector === "string") {
+    await page.waitForSelector(config.waitForSelector);
+  }
   const faviconElement = await page.$("link[rel='icon']");
   const faviconPath = faviconElement
     ? await faviconElement.getAttribute("href") ?? "favicon.ico"
@@ -132,7 +137,10 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData> {
 }
 
 async function fetchPageEntries(page: Page, url: string, origin: string, config: FeedConfig): Promise<FeedData['elements']> {
-  await page.goto(url, { timeout: (config.timeout ?? 60) * 1000, waitUntil: config.waitUntil ?? "networkidle" });
+  await page.goto(url, { timeout: (config.timeout ?? 60) * 1000, waitUntil: config.waitUntil ?? "domcontentloaded" });
+  if(typeof config.waitForSelector === "string") {
+    await page.waitForSelector(config.waitForSelector);
+  }
   const entriesElements = await page.$$(config.entrySelector);
   const entries: FeedData['elements'] = await Promise.all(entriesElements.map(async entryElement => {
     const titleElement = await entryElement.$(config.titleSelector);
