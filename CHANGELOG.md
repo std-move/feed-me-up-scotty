@@ -6,13 +6,15 @@ The following changes have been implemented but not released yet:
 
 ## [Unreleased]
 
+The following sections document changes that have been released already:
+
+## [1.4.0] - 2021-07-17
+
 ### New features
 
 - When the element matched by `entrySelector` is the element that contains the
   entry's link, you can now target that element by setting `linkSelector` to
   `*`.
-
-The following sections document changes that have been released already:
 
 ## [1.3.0] - 2021-07-09
 
