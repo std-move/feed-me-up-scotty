@@ -1,0 +1,201 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`can generate a feed where every element is also the link 1`] = `
+"<?xml version=\\"1.0\\" encoding=\\"utf-8\\"?>
+<feed xmlns=\\"http://www.w3.org/2005/Atom\\">
+    <id>http://localhost:5000/link-entry.html</id>
+    <title>Test fixture with entries being the link</title>
+    <updated>1970-01-01T00:00:00.000Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <icon>http://localhost:5000/favicon.ico</icon>
+    <entry>
+        <title type=\\"html\\"><![CDATA[Feed me up, Scotty! is the best!]]></title>
+        <id>https://feed-me-up-scotty.vincenttunru.com/</id>
+        <link href=\\"https://feed-me-up-scotty.vincenttunru.com/\\"/>
+        <updated>1970-01-01T00:00:00.000Z</updated>
+        <content type=\\"html\\"><![CDATA[<h1>
+			Feed me up, Scotty! is the best!
+		</h1>
+		<p>
+			It really is.
+		</p>]]></content>
+    </entry>
+    <entry>
+        <title type=\\"html\\"><![CDATA[No, this is even better]]></title>
+        <id>https://poop.bike/</id>
+        <link href=\\"https://poop.bike/\\"/>
+        <updated>1970-01-01T00:00:00.000Z</updated>
+        <content type=\\"html\\"><![CDATA[<h1>
+			No, this is even better
+		</h1>
+		<p>
+			It really, really is.
+		</p>]]></content>
+    </entry>
+</feed>"
+`;
+
+exports[`can generate a feed with all possible fields configured 1`] = `
+"<?xml version=\\"1.0\\" encoding=\\"utf-8\\"?>
+<rss version=\\"2.0\\" xmlns:dc=\\"http://purl.org/dc/elements/1.1/\\" xmlns:content=\\"http://purl.org/rss/1.0/modules/content/\\">
+    <channel>
+        <title>Maximal test fixture</title>
+        <link>undefined</link>
+        <description>undefined</description>
+        <lastBuildDate>Thu, 01 Jan 1970 00:00:00 GMT</lastBuildDate>
+        <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
+        <generator>https://github.com/jpmonette/feed</generator>
+        <item>
+            <title><![CDATA[Feed me up, Scotty! is the best!]]></title>
+            <link>https://feed-me-up-scotty.vincenttunru.com/</link>
+            <guid>https://feed-me-up-scotty.vincenttunru.com/</guid>
+            <pubDate>Thu, 01 Jan 1970 00:00:00 GMT</pubDate>
+            <content:encoded><![CDATA[It really is.]]></content:encoded>
+            <enclosure url=\\"https://picsum.photos/200/300\\" length=\\"0\\" type=\\"image//200/300\\"/>
+        </item>
+        <item>
+            <title><![CDATA[No, this is even better]]></title>
+            <link>https://poop.bike/</link>
+            <guid>https://poop.bike/</guid>
+            <pubDate>Thu, 01 Jan 1970 00:00:00 GMT</pubDate>
+            <content:encoded><![CDATA[It really, really is.]]></content:encoded>
+        </item>
+    </channel>
+</rss>"
+`;
+
+exports[`can generate a feed with the minimal configuration 1`] = `
+"<?xml version=\\"1.0\\" encoding=\\"utf-8\\"?>
+<feed xmlns=\\"http://www.w3.org/2005/Atom\\">
+    <id>http://localhost:5000/minimal.html</id>
+    <title>Maximal test fixture</title>
+    <updated>1970-01-01T00:00:00.000Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <icon>http://localhost:5000/favicon.ico</icon>
+    <entry>
+        <title type=\\"html\\"><![CDATA[Feed me up, Scotty! is the best!]]></title>
+        <id>https://feed-me-up-scotty.vincenttunru.com/</id>
+        <link href=\\"https://feed-me-up-scotty.vincenttunru.com/\\"/>
+        <updated>1970-01-01T00:00:00.000Z</updated>
+        <content type=\\"html\\"><![CDATA[<h1>
+			<a href=\\"https://feed-me-up-scotty.vincenttunru.com\\">Feed me up, Scotty! is the best!</a>
+		</h1>
+		<p>
+			It really is.
+		</p>]]></content>
+    </entry>
+    <entry>
+        <title type=\\"html\\"><![CDATA[No, this is even better]]></title>
+        <id>https://poop.bike/</id>
+        <link href=\\"https://poop.bike/\\"/>
+        <updated>1970-01-01T00:00:00.000Z</updated>
+        <content type=\\"html\\"><![CDATA[<h1>
+			<a href=\\"https://poop.bike\\">No, this is even better</a>
+		</h1>
+		<p>
+			It really, really is.
+		</p>]]></content>
+    </entry>
+</feed>"
+`;
+
+exports[`can generate a feed with the minimal configuration 2`] = `
+"<?xml version=\\"1.0\\" encoding=\\"utf-8\\"?>
+<rss version=\\"2.0\\" xmlns:dc=\\"http://purl.org/dc/elements/1.1/\\" xmlns:content=\\"http://purl.org/rss/1.0/modules/content/\\">
+    <channel>
+        <title>Combined feed</title>
+        <link>undefined</link>
+        <description>undefined</description>
+        <lastBuildDate>Thu, 01 Jan 1970 00:00:00 GMT</lastBuildDate>
+        <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
+        <generator>https://github.com/jpmonette/feed</generator>
+        <item>
+            <title><![CDATA[Feed me up, Scotty! is the best! (Maximal test fixture)]]></title>
+            <link>https://feed-me-up-scotty.vincenttunru.com/</link>
+            <guid>https://feed-me-up-scotty.vincenttunru.com/</guid>
+            <pubDate>Thu, 01 Jan 1970 00:00:00 GMT</pubDate>
+            <content:encoded><![CDATA[<h1>
+			<a href=\\"https://feed-me-up-scotty.vincenttunru.com\\">Feed me up, Scotty! is the best!</a>
+		</h1>
+		<p>
+			It really is.
+		</p>]]></content:encoded>
+        </item>
+        <item>
+            <title><![CDATA[No, this is even better (Maximal test fixture)]]></title>
+            <link>https://poop.bike/</link>
+            <guid>https://poop.bike/</guid>
+            <pubDate>Thu, 01 Jan 1970 00:00:00 GMT</pubDate>
+            <content:encoded><![CDATA[<h1>
+			<a href=\\"https://poop.bike\\">No, this is even better</a>
+		</h1>
+		<p>
+			It really, really is.
+		</p>]]></content:encoded>
+        </item>
+        <item>
+            <title><![CDATA[Feed me up, Scotty! is the best! (Maximal test fixture)]]></title>
+            <link>https://feed-me-up-scotty.vincenttunru.com/</link>
+            <guid>https://feed-me-up-scotty.vincenttunru.com/</guid>
+            <pubDate>Thu, 01 Jan 1970 00:00:00 GMT</pubDate>
+            <content:encoded><![CDATA[It really is.]]></content:encoded>
+            <enclosure url=\\"https://picsum.photos/200/300\\" length=\\"0\\" type=\\"image//200/300\\"/>
+        </item>
+        <item>
+            <title><![CDATA[No, this is even better (Maximal test fixture)]]></title>
+            <link>https://poop.bike/</link>
+            <guid>https://poop.bike/</guid>
+            <pubDate>Thu, 01 Jan 1970 00:00:00 GMT</pubDate>
+            <content:encoded><![CDATA[It really, really is.]]></content:encoded>
+        </item>
+        <item>
+            <title><![CDATA[Feed me up, Scotty! is the best! (Test fixture with images as background images)]]></title>
+            <link>https://feed-me-up-scotty.vincenttunru.com/</link>
+            <guid>https://feed-me-up-scotty.vincenttunru.com/</guid>
+            <pubDate>Thu, 01 Jan 1970 00:00:00 GMT</pubDate>
+            <content:encoded><![CDATA[<h1>
+			<a href=\\"https://feed-me-up-scotty.vincenttunru.com\\">Feed me up, Scotty! is the best!</a>
+		</h1>
+		<p class=\\"image\\" style=\\"background-image: url(https://picsum.photos/200/300)\\">
+			It really is.
+		</p>]]></content:encoded>
+        </item>
+        <item>
+            <title><![CDATA[No, this is even better (Test fixture with images as background images)]]></title>
+            <link>https://poop.bike/</link>
+            <guid>https://poop.bike/</guid>
+            <pubDate>Thu, 01 Jan 1970 00:00:00 GMT</pubDate>
+            <content:encoded><![CDATA[<h1>
+			<a href=\\"https://poop.bike\\">No, this is even better</a>
+		</h1>
+		<p class=\\"image\\" style=\\"background-image: url(https://picsum.photos/id/237/200/300)\\">
+			It really, really is.
+		</p>]]></content:encoded>
+        </item>
+        <item>
+            <title><![CDATA[Feed me up, Scotty! is the best! (Test fixture with entries being the link)]]></title>
+            <link>https://feed-me-up-scotty.vincenttunru.com/</link>
+            <guid>https://feed-me-up-scotty.vincenttunru.com/</guid>
+            <pubDate>Thu, 01 Jan 1970 00:00:00 GMT</pubDate>
+            <content:encoded><![CDATA[<h1>
+			Feed me up, Scotty! is the best!
+		</h1>
+		<p>
+			It really is.
+		</p>]]></content:encoded>
+        </item>
+        <item>
+            <title><![CDATA[No, this is even better (Test fixture with entries being the link)]]></title>
+            <link>https://poop.bike/</link>
+            <guid>https://poop.bike/</guid>
+            <pubDate>Thu, 01 Jan 1970 00:00:00 GMT</pubDate>
+            <content:encoded><![CDATA[<h1>
+			No, this is even better
+		</h1>
+		<p>
+			It really, really is.
+		</p>]]></content:encoded>
+        </item>
+    </channel>
+</rss>"
+`;

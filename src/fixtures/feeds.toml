@@ -1,0 +1,30 @@
+[minimal]
+title = "Maximal test fixture"
+url = "http://localhost:5000/minimal.html"
+entrySelector = "article"
+titleSelector = "h1"
+linkSelector = "a"
+
+[maximal]
+title = "Maximal test fixture"
+url = "http://localhost:5000/maximal.html"
+entrySelector = "article"
+titleSelector = "h1"
+linkSelector = "a"
+imageSelector = "img"
+contentSelector = "p"
+
+[background-image]
+title = "Test fixture with images as background images"
+url = "http://localhost:5000/background-image.html"
+entrySelector = "article"
+titleSelector = "h1"
+linkSelector = "a"
+imageSelector = ".img"
+
+[link-entry]
+title = "Test fixture with entries being the link"
+url = "http://localhost:5000/link-entry.html"
+entrySelector = "a"
+titleSelector = "h1"
+linkSelector = "*"
