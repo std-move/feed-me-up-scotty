@@ -25,6 +25,8 @@ build_website:
 test:
   image: mcr.microsoft.com/playwright:v1.12.3-focal
   stage: test
+  dependencies:
+  - build
   script:
     - npm test
 
