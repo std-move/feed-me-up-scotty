@@ -11,7 +11,7 @@ Date.now = jest.fn(() => 0);
 let server: http.Server;
 
 beforeAll(async () => {
-	await rm(resolve(__dirname, "../public/"), { recursive: true });
+	await rm(resolve(__dirname, "../public/"), { recursive: true, force: true });
 
 	server = http.createServer((request, response) => {
 		// You pass two more arguments for config and middleware
