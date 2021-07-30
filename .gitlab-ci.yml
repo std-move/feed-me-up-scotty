@@ -28,6 +28,9 @@ test:
   dependencies:
   - build
   script:
+    # Explicitly install Playwright to run the postinstall script
+    # to download Firefox - it's not included in the previous job's artefacts.
+    - npm install playwright-firefox
     - npm test
 
 deploy_website:
