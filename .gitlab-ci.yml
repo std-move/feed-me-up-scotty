@@ -28,6 +28,8 @@ test:
   dependencies:
   - build
   script:
+    - ls
+    - ls node_modules
     - npm test
 
 deploy_website:
