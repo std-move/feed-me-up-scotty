@@ -18,7 +18,7 @@ async function getBrowser() {
   return browser;
 }
 
-export async function run(configFilePath = "./feeds.toml") {
+export async function run(configFilePath = "./feeds.toml"): Promise<void> {
   const feedConfigs = await loadFeedConfigs(configFilePath);
   const feedsData = await (
     await Promise.all(feedConfigs.map(fetchFeedData))

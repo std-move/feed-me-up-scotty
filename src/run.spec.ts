@@ -11,45 +11,60 @@ Date.now = jest.fn(() => 0);
 let server: http.Server;
 
 beforeAll(async () => {
-	await rm(resolve(__dirname, "../public/"), { recursive: true, force: true });
+  await rm(resolve(__dirname, "../public/"), { recursive: true, force: true });
 
-	server = http.createServer((request, response) => {
-		// You pass two more arguments for config and middleware
-		// More details here: https://github.com/vercel/serve-handler#options
-		return handler(request, response, { public: "./src/fixtures" });
-	})
+  server = http.createServer((request, response) => {
+    // You pass two more arguments for config and middleware
+    // More details here: https://github.com/vercel/serve-handler#options
+    return handler(request, response, { public: "./src/fixtures" });
+  });
 
-	server.listen(5000, () => {
-		console.log('Fixture server running at http://localhost:5000');
-	});
+  server.listen(5000, () => {
+    console.log("Fixture server running at http://localhost:5000");
+  });
 
-	await run(resolve(__dirname, "./fixtures/feeds.toml"));
+  await run(resolve(__dirname, "./fixtures/feeds.toml"));
 
-	server.close();
+  server.close();
 });
 
 it("can generate a feed with the minimal configuration", async () => {
-	const minimalFeed = await readFile(resolve(__dirname, "../public/minimal.xml"), "utf-8");
-	expect(minimalFeed).toMatchSnapshot();
+  const minimalFeed = await readFile(
+    resolve(__dirname, "../public/minimal.xml"),
+    "utf-8"
+  );
+  expect(minimalFeed).toMatchSnapshot();
 });
 
 it("can generate a feed with all possible fields configured", async () => {
-	const maximalFeed = await readFile(resolve(__dirname, "../public/maximal.xml"), "utf-8");
-	expect(maximalFeed).toMatchSnapshot();
+  const maximalFeed = await readFile(
+    resolve(__dirname, "../public/maximal.xml"),
+    "utf-8"
+  );
+  expect(maximalFeed).toMatchSnapshot();
 });
 
 it("can find images even when they are defined as background images", async () => {
-	const backgroundImageFeed = await readFile(resolve(__dirname, "../public/background-image.xml"), "utf-8");
-	expect(backgroundImageFeed).toMatch("https://picsum.photos/200/300");
-	expect(backgroundImageFeed).toMatch("https://picsum.photos/id/237/200/300");
+  const backgroundImageFeed = await readFile(
+    resolve(__dirname, "../public/background-image.xml"),
+    "utf-8"
+  );
+  expect(backgroundImageFeed).toMatch("https://picsum.photos/200/300");
+  expect(backgroundImageFeed).toMatch("https://picsum.photos/id/237/200/300");
 });
 
 it("can generate a feed where every element is also the link", async () => {
-	const linkEntryFeed = await readFile(resolve(__dirname, "../public/link-entry.xml"), "utf-8");
-	expect(linkEntryFeed).toMatchSnapshot();
+  const linkEntryFeed = await readFile(
+    resolve(__dirname, "../public/link-entry.xml"),
+    "utf-8"
+  );
+  expect(linkEntryFeed).toMatchSnapshot();
 });
 
 it("can generate a feed with the minimal configuration", async () => {
-	const combinedFeed = await readFile(resolve(__dirname, "../public/all.xml"), "utf-8");
-	expect(combinedFeed).toMatchSnapshot();
+  const combinedFeed = await readFile(
+    resolve(__dirname, "../public/all.xml"),
+    "utf-8"
+  );
+  expect(combinedFeed).toMatchSnapshot();
 });

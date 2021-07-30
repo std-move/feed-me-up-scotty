@@ -13,24 +13,16 @@ exports[`can generate a feed where every element is also the link 1`] = `
         <id>https://feed-me-up-scotty.vincenttunru.com/</id>
         <link href=\\"https://feed-me-up-scotty.vincenttunru.com/\\"/>
         <updated>1970-01-01T00:00:00.000Z</updated>
-        <content type=\\"html\\"><![CDATA[<h1>
-			Feed me up, Scotty! is the best!
-		</h1>
-		<p>
-			It really is.
-		</p>]]></content>
+        <content type=\\"html\\"><![CDATA[<h1>Feed me up, Scotty! is the best!</h1>
+      <p>It really is.</p>]]></content>
     </entry>
     <entry>
         <title type=\\"html\\"><![CDATA[No, this is even better]]></title>
         <id>https://poop.bike/</id>
         <link href=\\"https://poop.bike/\\"/>
         <updated>1970-01-01T00:00:00.000Z</updated>
-        <content type=\\"html\\"><![CDATA[<h1>
-			No, this is even better
-		</h1>
-		<p>
-			It really, really is.
-		</p>]]></content>
+        <content type=\\"html\\"><![CDATA[<h1>No, this is even better</h1>
+      <p>It really, really is.</p>]]></content>
     </entry>
 </feed>"
 `;
@@ -78,11 +70,9 @@ exports[`can generate a feed with the minimal configuration 1`] = `
         <link href=\\"https://feed-me-up-scotty.vincenttunru.com/\\"/>
         <updated>1970-01-01T00:00:00.000Z</updated>
         <content type=\\"html\\"><![CDATA[<h1>
-			<a href=\\"https://feed-me-up-scotty.vincenttunru.com\\">Feed me up, Scotty! is the best!</a>
-		</h1>
-		<p>
-			It really is.
-		</p>]]></content>
+        <a href=\\"https://feed-me-up-scotty.vincenttunru.com\\">Feed me up, Scotty! is the best!</a>
+      </h1>
+      <p>It really is.</p>]]></content>
     </entry>
     <entry>
         <title type=\\"html\\"><![CDATA[No, this is even better]]></title>
@@ -90,11 +80,9 @@ exports[`can generate a feed with the minimal configuration 1`] = `
         <link href=\\"https://poop.bike/\\"/>
         <updated>1970-01-01T00:00:00.000Z</updated>
         <content type=\\"html\\"><![CDATA[<h1>
-			<a href=\\"https://poop.bike\\">No, this is even better</a>
-		</h1>
-		<p>
-			It really, really is.
-		</p>]]></content>
+        <a href=\\"https://poop.bike\\">No, this is even better</a>
+      </h1>
+      <p>It really, really is.</p>]]></content>
     </entry>
 </feed>"
 `;
@@ -115,11 +103,9 @@ exports[`can generate a feed with the minimal configuration 2`] = `
             <guid>https://feed-me-up-scotty.vincenttunru.com/</guid>
             <pubDate>Thu, 01 Jan 1970 00:00:00 GMT</pubDate>
             <content:encoded><![CDATA[<h1>
-			<a href=\\"https://feed-me-up-scotty.vincenttunru.com\\">Feed me up, Scotty! is the best!</a>
-		</h1>
-		<p>
-			It really is.
-		</p>]]></content:encoded>
+        <a href=\\"https://feed-me-up-scotty.vincenttunru.com\\">Feed me up, Scotty! is the best!</a>
+      </h1>
+      <p>It really is.</p>]]></content:encoded>
         </item>
         <item>
             <title><![CDATA[No, this is even better (Maximal test fixture)]]></title>
@@ -127,11 +113,9 @@ exports[`can generate a feed with the minimal configuration 2`] = `
             <guid>https://poop.bike/</guid>
             <pubDate>Thu, 01 Jan 1970 00:00:00 GMT</pubDate>
             <content:encoded><![CDATA[<h1>
-			<a href=\\"https://poop.bike\\">No, this is even better</a>
-		</h1>
-		<p>
-			It really, really is.
-		</p>]]></content:encoded>
+        <a href=\\"https://poop.bike\\">No, this is even better</a>
+      </h1>
+      <p>It really, really is.</p>]]></content:encoded>
         </item>
         <item>
             <title><![CDATA[Feed me up, Scotty! is the best! (Maximal test fixture)]]></title>
@@ -154,11 +138,11 @@ exports[`can generate a feed with the minimal configuration 2`] = `
             <guid>https://feed-me-up-scotty.vincenttunru.com/</guid>
             <pubDate>Thu, 01 Jan 1970 00:00:00 GMT</pubDate>
             <content:encoded><![CDATA[<h1>
-			<a href=\\"https://feed-me-up-scotty.vincenttunru.com\\">Feed me up, Scotty! is the best!</a>
-		</h1>
-		<p class=\\"image\\" style=\\"background-image: url(https://picsum.photos/200/300)\\">
-			It really is.
-		</p>]]></content:encoded>
+        <a href=\\"https://feed-me-up-scotty.vincenttunru.com\\">Feed me up, Scotty! is the best!</a>
+      </h1>
+      <p class=\\"image\\" style=\\"background-image: url(https://picsum.photos/200/300)\\">
+        It really is.
+      </p>]]></content:encoded>
         </item>
         <item>
             <title><![CDATA[No, this is even better (Test fixture with images as background images)]]></title>
@@ -166,35 +150,27 @@ exports[`can generate a feed with the minimal configuration 2`] = `
             <guid>https://poop.bike/</guid>
             <pubDate>Thu, 01 Jan 1970 00:00:00 GMT</pubDate>
             <content:encoded><![CDATA[<h1>
-			<a href=\\"https://poop.bike\\">No, this is even better</a>
-		</h1>
-		<p class=\\"image\\" style=\\"background-image: url(https://picsum.photos/id/237/200/300)\\">
-			It really, really is.
-		</p>]]></content:encoded>
+        <a href=\\"https://poop.bike\\">No, this is even better</a>
+      </h1>
+      <p class=\\"image\\" style=\\"background-image: url(https://picsum.photos/id/237/200/300)\\">
+        It really, really is.
+      </p>]]></content:encoded>
         </item>
         <item>
             <title><![CDATA[Feed me up, Scotty! is the best! (Test fixture with entries being the link)]]></title>
             <link>https://feed-me-up-scotty.vincenttunru.com/</link>
             <guid>https://feed-me-up-scotty.vincenttunru.com/</guid>
             <pubDate>Thu, 01 Jan 1970 00:00:00 GMT</pubDate>
-            <content:encoded><![CDATA[<h1>
-			Feed me up, Scotty! is the best!
-		</h1>
-		<p>
-			It really is.
-		</p>]]></content:encoded>
+            <content:encoded><![CDATA[<h1>Feed me up, Scotty! is the best!</h1>
+      <p>It really is.</p>]]></content:encoded>
         </item>
         <item>
             <title><![CDATA[No, this is even better (Test fixture with entries being the link)]]></title>
             <link>https://poop.bike/</link>
             <guid>https://poop.bike/</guid>
             <pubDate>Thu, 01 Jan 1970 00:00:00 GMT</pubDate>
-            <content:encoded><![CDATA[<h1>
-			No, this is even better
-		</h1>
-		<p>
-			It really, really is.
-		</p>]]></content:encoded>
+            <content:encoded><![CDATA[<h1>No, this is even better</h1>
+      <p>It really, really is.</p>]]></content:encoded>
         </item>
     </channel>
 </rss>"
