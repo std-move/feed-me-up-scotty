@@ -20,8 +20,12 @@ async function getBrowser() {
 
 export async function run(configFilePath = "./feeds.toml") {
   const feedConfigs = await loadFeedConfigs(configFilePath);
-  const feedsData = await Promise.all(feedConfigs.map(fetchFeedData));
-  const individualFeedPromises = feedsData.map((feedData, i) => generateFeed(feedConfigs[i].id, feedData));
+  const feedsData = await (
+    await Promise.all(feedConfigs.map(fetchFeedData))
+  ).filter(isNotNull);
+  const individualFeedPromises = feedsData.map((feedData, i) =>
+    generateFeed(feedConfigs[i].id, feedData)
+  );
 
   const combinedFeedData = combineFeedData(feedsData);
   await generateFeed("all", combinedFeedData);
@@ -32,7 +36,7 @@ export async function run(configFilePath = "./feeds.toml") {
   console.log("Feeds generated in `public/`.");
   if (typeof getRootUrl() === "string") {
     console.log("\nThey will be published at:");
-    feedConfigs.forEach(feedConfig => {
+    feedConfigs.forEach((feedConfig) => {
       console.log(`- ${getRootUrl()}${feedConfig.id}.xml`);
     });
     console.log(`\nA combined feed is available at:\n\t${getRootUrl()}all.xml`);
@@ -46,7 +50,11 @@ async function generateFeed(feedId: string, feedData: FeedData) {
     // Directory `public` already exists; continuing.
   });
   await writeFile(`public/${feedId}.xml`, feed, "utf-8");
-  await writeFile(`public/${feedId}.json`, JSON.stringify(feedDataWithDates), "utf-8");
+  await writeFile(
+    `public/${feedId}.json`,
+    JSON.stringify(feedDataWithDates),
+    "utf-8"
+  );
 }
 
 type FeedConfig = {
@@ -63,7 +71,9 @@ type FeedConfig = {
   /** This option is experimental, and may be removed at any time: */
   waitForSelector?: string;
   /** This option is experimental, and may be removed at any time: */
-  waitUntil?: NonNullable<Parameters<Page['goto']>[1]>['waitUntil'];
+  waitUntil?: NonNullable<Parameters<Page["goto"]>[1]>["waitUntil"];
+  /** This optino is experimental, and may be removed at any time: */
+  onFail?: "error" | "stale" | "exclude";
 };
 
 async function loadFeedConfigs(configFilePath: string): Promise<FeedConfig[]> {
@@ -71,9 +81,12 @@ async function loadFeedConfigs(configFilePath: string): Promise<FeedConfig[]> {
   const parsed = parse(configFile, 1.0, "\n", false);
   const defaultSettingsId = "default";
 
-  const feedIds = Object.keys(parsed).filter(feedId => feedId !== defaultSettingsId);
-  const defaultConfig: Partial<FeedConfig> = parsed[defaultSettingsId] as unknown as Partial<FeedConfig> ?? {};
-  return feedIds.map(feedId => {
+  const feedIds = Object.keys(parsed).filter(
+    (feedId) => feedId !== defaultSettingsId
+  );
+  const defaultConfig: Partial<FeedConfig> =
+    (parsed[defaultSettingsId] as unknown as Partial<FeedConfig>) ?? {};
+  return feedIds.map((feedId) => {
     const feedToml = parsed[feedId] as unknown as FeedConfig;
     return {
       ...defaultConfig,
@@ -97,109 +110,153 @@ type FeedData = {
   }>;
 };
 
-async function fetchFeedData(config: FeedConfig): Promise<FeedData> {
-  const firstUrl = Array.isArray(config.url) ? config.url[0] : config.url;
-  const url = new URL(firstUrl);
-  const origin = url.origin;
-  const browser = await getBrowser();
-  const context = await browser.newContext();
-  const page = await context.newPage();
-  await page.goto(firstUrl, { timeout: (config.timeout ?? 60) * 1000, waitUntil: config.waitUntil ?? "domcontentloaded" });
-  if(typeof config.waitForSelector === "string") {
-    await page.waitForSelector(config.waitForSelector);
+async function fetchFeedData(config: FeedConfig): Promise<FeedData | null> {
+  try {
+    const firstUrl = Array.isArray(config.url) ? config.url[0] : config.url;
+    const url = new URL(firstUrl);
+    const origin = url.origin;
+    const browser = await getBrowser();
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await page.goto(firstUrl, {
+      timeout: (config.timeout ?? 60) * 1000,
+      waitUntil: config.waitUntil ?? "domcontentloaded",
+    });
+    if (typeof config.waitForSelector === "string") {
+      await page.waitForSelector(config.waitForSelector);
+    }
+    const faviconElement = await page.$("link[rel='icon']");
+    const faviconPath = faviconElement
+      ? (await faviconElement.getAttribute("href")) ?? "favicon.ico"
+      : "favicon.ico";
+    const faviconUrl = new URL(faviconPath, origin).href;
+    const allUrls = Array.isArray(config.url) ? config.url : [config.url];
+    const entries = await allUrls.reduce(async (accPromise, url) => {
+      const acc = await accPromise;
+      const pageEntries = await fetchPageEntries(page, url, origin, config);
+      return acc.concat(pageEntries);
+    }, Promise.resolve([] as FeedData["elements"]));
+
+    const filters = config.filters;
+    const filteredEntries = Array.isArray(filters)
+      ? entries.filter((entry) =>
+          filters.every((filter) => !entry.contents.includes(filter))
+        )
+      : entries;
+
+    return {
+      title: config.title ?? config.id,
+      url: firstUrl,
+      favicon: faviconUrl,
+      elements: filteredEntries,
+    };
+  } catch (e: unknown) {
+    if (config.onFail === "stale") {
+      const existingFeedData = await fetchExistingFeedData(config.id);
+      if (existingFeedData !== null) {
+        return existingFeedData;
+      }
+    }
+
+    if (config.onFail === "exclude") {
+      return null;
+    }
+
+    throw e;
   }
-  const faviconElement = await page.$("link[rel='icon']");
-  const faviconPath = faviconElement
-    ? await faviconElement.getAttribute("href") ?? "favicon.ico"
-    : "favicon.ico";
-  const faviconUrl = (new URL(faviconPath, origin)).href;
-  const allUrls = Array.isArray(config.url) ? config.url : [config.url];
-  const entries = await allUrls.reduce(async (accPromise, url) => {
-    const acc = await accPromise;
-    const pageEntries = await fetchPageEntries(page, url, origin, config);
-    return acc.concat(pageEntries);
-  }, Promise.resolve([] as FeedData['elements']));
-
-  const filters = config.filters;
-  const filteredEntries = Array.isArray(filters)
-    ? entries.filter(entry => filters.every(filter => !entry.contents.includes(filter)))
-    : entries;
-
-  return {
-    title: config.title ?? config.id,
-    url: firstUrl,
-    favicon: faviconUrl,
-    elements: filteredEntries,
-  };
 }
 
-async function fetchPageEntries(page: Page, url: string, origin: string, config: FeedConfig): Promise<FeedData['elements']> {
-  await page.goto(url, { timeout: (config.timeout ?? 60) * 1000, waitUntil: config.waitUntil ?? "domcontentloaded" });
-  if(typeof config.waitForSelector === "string") {
+async function fetchPageEntries(
+  page: Page,
+  url: string,
+  origin: string,
+  config: FeedConfig
+): Promise<FeedData["elements"]> {
+  await page.goto(url, {
+    timeout: (config.timeout ?? 60) * 1000,
+    waitUntil: config.waitUntil ?? "domcontentloaded",
+  });
+  if (typeof config.waitForSelector === "string") {
     await page.waitForSelector(config.waitForSelector);
   }
   const entriesElements = await page.$$(config.entrySelector);
-  const entries: FeedData['elements'] = await Promise.all(entriesElements.map(async entryElement => {
-    const titleElement = await entryElement.$(config.titleSelector);
+  const entries: FeedData["elements"] = await Promise.all(
+    entriesElements.map(async (entryElement) => {
+      const titleElement = await entryElement.$(config.titleSelector);
 
-    const linkElement = config.linkSelector === "*"
-      ? entryElement
-      : await entryElement.$(config.linkSelector);
-    const linkValue = await linkElement?.getAttribute("href");
-    const normalisedLink = linkValue
-      ? (new URL(linkValue, origin).href)
-      : undefined;
+      const linkElement =
+        config.linkSelector === "*"
+          ? entryElement
+          : await entryElement.$(config.linkSelector);
+      const linkValue = await linkElement?.getAttribute("href");
+      const normalisedLink = linkValue
+        ? new URL(linkValue, origin).href
+        : undefined;
 
-    const contentElement = typeof config.contentSelector === "string"
-      ? await entryElement.$(config.contentSelector) ?? entryElement
-      : entryElement;
+      const contentElement =
+        typeof config.contentSelector === "string"
+          ? (await entryElement.$(config.contentSelector)) ?? entryElement
+          : entryElement;
 
-    const imageElement = typeof config.imageSelector === "string"
-      ? await entryElement.$(config.imageSelector)
-      : undefined;
-    let imageUrl = await imageElement?.getAttribute("src");
-    try {
-      if (config.imageSelector && typeof imageUrl !== "string") {
-        const backgroundImageValue = await entryElement.$eval(config.imageSelector, (el) => el.style["background-image"]);
-        if (
-          typeof backgroundImageValue === "string" &&
-          backgroundImageValue.substring(0, "url(".length) === "url(" &&
-          backgroundImageValue.charAt(backgroundImageValue.length - 1) === ")"
-        ) {
-          const urlValue = backgroundImageValue.substring("url(".length, backgroundImageValue.length - 1);
-          const urlValueWithoutQuotes = (urlValue.charAt(0) === '"' || urlValue.charAt(0) === "'")
-            ? urlValue.substring(1, urlValue.length - 1)
-            : urlValue;
-          const url = new URL(urlValueWithoutQuotes);
-          imageUrl = url.href;
+      const imageElement =
+        typeof config.imageSelector === "string"
+          ? await entryElement.$(config.imageSelector)
+          : undefined;
+      let imageUrl = await imageElement?.getAttribute("src");
+      try {
+        if (config.imageSelector && typeof imageUrl !== "string") {
+          const backgroundImageValue = await entryElement.$eval(
+            config.imageSelector,
+            (el) => el.style["background-image"]
+          );
+          if (
+            typeof backgroundImageValue === "string" &&
+            backgroundImageValue.substring(0, "url(".length) === "url(" &&
+            backgroundImageValue.charAt(backgroundImageValue.length - 1) === ")"
+          ) {
+            const urlValue = backgroundImageValue.substring(
+              "url(".length,
+              backgroundImageValue.length - 1
+            );
+            const urlValueWithoutQuotes =
+              urlValue.charAt(0) === '"' || urlValue.charAt(0) === "'"
+                ? urlValue.substring(1, urlValue.length - 1)
+                : urlValue;
+            const url = new URL(urlValueWithoutQuotes);
+            imageUrl = url.href;
+          }
         }
+      } catch (e) {
+        // No image element found, or not in a URL format we understand.
+        // Skip the image.
       }
-    } catch(e) {
-      // No image element found, or not in a URL format we understand.
-      // Skip the image.
-    }
-    const normalisedImgSrc = imageUrl
-      ? (new URL(imageUrl, origin).href)
-      : undefined;
+      const normalisedImgSrc = imageUrl
+        ? new URL(imageUrl, origin).href
+        : undefined;
 
-    return {
-      title: (await titleElement?.textContent())?.trim() ?? undefined,
-      contents: (await contentElement.innerHTML()).trim(),
-      link: normalisedLink,
-      retrieved: Date.now(),
-      image: normalisedImgSrc,
-    };
-  }));
+      return {
+        title: (await titleElement?.textContent())?.trim() ?? undefined,
+        contents: (await contentElement.innerHTML()).trim(),
+        link: normalisedLink,
+        retrieved: Date.now(),
+        image: normalisedImgSrc,
+      };
+    })
+  );
 
   return entries;
 }
 
 function combineFeedData(feedsData: FeedData[]): FeedData {
   const elements = feedsData.reduce(
-    (soFar, feedData) => soFar.concat(
-      feedData.elements.map(element => ({ ...element, title: element.title + ` (${feedData.title})` })
-    )),
-    [] as FeedData['elements']
+    (soFar, feedData) =>
+      soFar.concat(
+        feedData.elements.map((element) => ({
+          ...element,
+          title: element.title + ` (${feedData.title})`,
+        }))
+      ),
+    [] as FeedData["elements"]
   );
   return {
     title: "Combined feed",
@@ -226,7 +283,7 @@ function toFeed(feedData: FeedData): string {
     });
   });
 
-  if (feedData.elements.some(element => typeof element.image === "string")) {
+  if (feedData.elements.some((element) => typeof element.image === "string")) {
     // Atom feeds don't support entry images:
     return feed.rss2();
   }
@@ -234,20 +291,19 @@ function toFeed(feedData: FeedData): string {
   return feed.atom1();
 }
 
-async function reconcileDates(feedId: string, feedData: FeedData): Promise<FeedData> {
-  const rootUrl = getRootUrl();
-  if (typeof rootUrl !== "string") {
-    return feedData;
-  }
-  const response = await fetch(`${rootUrl}${feedId}.json`);
-  if (!response.ok) {
+async function reconcileDates(
+  feedId: string,
+  feedData: FeedData
+): Promise<FeedData> {
+  const existingFeedData: FeedData | null = await fetchExistingFeedData(feedId);
+  if (existingFeedData === null) {
     return feedData;
   }
 
-  const existingFeedData: FeedData = await response.json();
-
-  const newElements = feedData.elements.map(element => {
-    const existingElement = existingFeedData.elements.find(el => typeof el.link === "string" && el.link === element.link);
+  const newElements = feedData.elements.map((element) => {
+    const existingElement = existingFeedData.elements.find(
+      (el) => typeof el.link === "string" && el.link === element.link
+    );
     if (!existingElement) {
       return element;
     }
@@ -263,6 +319,26 @@ async function reconcileDates(feedId: string, feedData: FeedData): Promise<FeedD
   };
 }
 
+const existingFeedData: Record<string, FeedData> = {};
+async function fetchExistingFeedData(feedId: string): Promise<FeedData | null> {
+  if (typeof existingFeedData[feedId] !== "undefined") {
+    return existingFeedData[feedId];
+  }
+
+  const rootUrl = getRootUrl();
+  if (typeof rootUrl !== "string") {
+    return null;
+  }
+  const response = await fetch(`${rootUrl}${feedId}.json`);
+  if (!response.ok) {
+    return null;
+  }
+
+  const existingData: FeedData = await response.json();
+  existingFeedData[feedId] = existingData;
+  return existingData;
+}
+
 function getRootUrl(): string | undefined {
   const rootUrl = process.env.CI_PAGES_URL ?? getGithubPagesUrl();
   if (typeof rootUrl !== "string") {
@@ -272,6 +348,10 @@ function getRootUrl(): string | undefined {
     ? rootUrl
     : rootUrl + "/";
   return rootUrlWithTrailingSlash;
+}
+
+function isNotNull<X>(value: X | null): value is X {
+  return value !== null;
 }
 
 function getGithubPagesUrl(): string | undefined {
