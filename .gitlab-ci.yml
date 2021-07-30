@@ -30,6 +30,7 @@ test:
   script:
     - ls
     - ls node_modules
+    - npm install playwright-firefox
     - npm test
 
 deploy_website:
