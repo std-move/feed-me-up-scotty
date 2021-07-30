@@ -154,11 +154,13 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData | null> {
     if (config.onFail === "stale") {
       const existingFeedData = await fetchExistingFeedData(config.id);
       if (existingFeedData !== null) {
+        console.log(`Could not fetch ${config.id}; preserving existing feed.`);
         return existingFeedData;
       }
     }
 
     if (config.onFail === "exclude") {
+      console.log(`Could not fetch ${config.id}; not generating its feed.`);
       return null;
     }
 
