@@ -95,9 +95,7 @@ exports[`can generate a combined feed 1`] = `
       </h1>
       <p>
         It really is.
-        <time datetime=\\"2021-07-31\\">
-          July 31
-        </time>
+        <time datetime=\\"2021-07-31\\"> July 31 </time>
       </p>]]></content:encoded>
         </item>
         <item>
@@ -110,9 +108,7 @@ exports[`can generate a combined feed 1`] = `
       </h1>
       <p>
         It really, really is.
-        <time>
-          2021-08-01
-        </time>
+        <time> 2021-08-01 </time>
       </p>]]></content:encoded>
         </item>
         <item>
@@ -125,9 +121,7 @@ exports[`can generate a combined feed 1`] = `
       </h1>
       <p>
         Drops mic.
-        <time datetime=\\"2011-11-18T14:54:39.929\\">
-          18 November 2011
-        </time>
+        <time datetime=\\"2011-11-18T14:54:39.929\\"> 18 November 2011 </time>
       </p>]]></content:encoded>
         </item>
     </channel>
@@ -208,9 +202,7 @@ exports[`can generate a feed with dates extracted from the content 1`] = `
       </h1>
       <p>
         It really is.
-        <time datetime=\\"2021-07-31\\">
-          July 31
-        </time>
+        <time datetime=\\"2021-07-31\\"> July 31 </time>
       </p>]]></content>
     </entry>
     <entry>
@@ -223,9 +215,7 @@ exports[`can generate a feed with dates extracted from the content 1`] = `
       </h1>
       <p>
         It really, really is.
-        <time>
-          2021-08-01
-        </time>
+        <time> 2021-08-01 </time>
       </p>]]></content>
     </entry>
     <entry>
@@ -238,9 +228,7 @@ exports[`can generate a feed with dates extracted from the content 1`] = `
       </h1>
       <p>
         Drops mic.
-        <time datetime=\\"2011-11-18T14:54:39.929\\">
-          18 November 2011
-        </time>
+        <time datetime=\\"2011-11-18T14:54:39.929\\"> 18 November 2011 </time>
       </p>]]></content>
     </entry>
 </feed>"
