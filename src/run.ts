@@ -219,7 +219,7 @@ async function fetchPageEntries(
         dateValue = parseDate(
           dateElementContent.trim(),
           config.dateFormat,
-          new Date()
+          new Date(Date.now())
         ).getTime();
       }
       if (Number.isNaN(dateValue)) {
