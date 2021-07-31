@@ -99,6 +99,24 @@ matching the element inside individual feed entries containing that entry's
 content. For example, `p.lead`. If not provided, the entry as a whole will be
 used as the content.
 
+## `dateSelector`
+
+Optional, [string](https://toml.io/en/v1.0.0#string).
+
+[CSS
+Selector](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Selectors)
+matching the element inside individual feed entries containing that entry's
+publication date. For example, `time`. If not provided, the date the feed was
+generated will be used as the publication time.
+
+## `dateFormat`
+
+Optional, [string](https://toml.io/en/v1.0.0#string).
+
+Used in combination with `dateSelector`.
+[Format string as understood by `date-fns`](https://date-fns.org/v2.23.0/docs/parse)
+that describes the format of the date in the element matched by `dateSelector`.
+
 ## `timeout`
 
 Optional, [integer](https://toml.io/en/v1.0.0#integer).

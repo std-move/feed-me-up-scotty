@@ -28,3 +28,12 @@ url = "http://localhost:5000/link-entry.html"
 entrySelector = "a"
 titleSelector = "h1"
 linkSelector = "*"
+
+[date]
+title = "Test fixture with parsable dates"
+url = "http://localhost:5000/date.html"
+entrySelector = "article"
+titleSelector = "h1"
+linkSelector = "a"
+dateSelector = "time"
+dateFormat = "yyyy-MM-dd"

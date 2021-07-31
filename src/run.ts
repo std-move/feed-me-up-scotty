@@ -3,7 +3,8 @@ import { Feed } from "feed";
 import { writeFile, mkdir, readFile } from "fs/promises";
 import fetch from "node-fetch";
 import { URL } from "url";
-import { parse } from "@ltd/j-toml";
+import { parse as parseToml } from "@ltd/j-toml";
+import { parse as parseDate, parseISO as parseIsoDate } from "date-fns";
 
 let browser: Browser;
 let browsePromise: Promise<Browser>;
@@ -65,6 +66,8 @@ type FeedConfig = {
   titleSelector: string;
   linkSelector: string;
   contentSelector?: string;
+  dateSelector?: string;
+  dateFormat?: string;
   imageSelector?: string;
   filters?: string[];
   timeout?: number;
@@ -78,7 +81,7 @@ type FeedConfig = {
 
 async function loadFeedConfigs(configFilePath: string): Promise<FeedConfig[]> {
   const configFile = await readFile(configFilePath, "utf-8");
-  const parsed = parse(configFile, 1.0, "\n", false);
+  const parsed = parseToml(configFile, 1.0, "\n", false);
   const defaultSettingsId = "default";
 
   const feedIds = Object.keys(parsed).filter(
@@ -200,6 +203,29 @@ async function fetchPageEntries(
           ? (await entryElement.$(config.contentSelector)) ?? entryElement
           : entryElement;
 
+      const dateElement =
+        typeof config.dateSelector === "string"
+          ? await entryElement.$(config.dateSelector)
+          : undefined;
+      const datetimeAttribute = await dateElement?.getAttribute("datetime");
+      const dateElementContent = await dateElement?.textContent();
+      let dateValue: number | undefined = undefined;
+      if (typeof datetimeAttribute === "string") {
+        dateValue = parseDatetime(datetimeAttribute)?.getTime();
+      } else if (
+        typeof dateElementContent === "string" &&
+        typeof config.dateFormat === "string"
+      ) {
+        dateValue = parseDate(
+          dateElementContent.trim(),
+          config.dateFormat,
+          new Date()
+        ).getTime();
+      }
+      if (Number.isNaN(dateValue)) {
+        dateValue = undefined;
+      }
+
       const imageElement =
         typeof config.imageSelector === "string"
           ? await entryElement.$(config.imageSelector)
@@ -240,7 +266,7 @@ async function fetchPageEntries(
         title: (await titleElement?.textContent())?.trim() ?? undefined,
         contents: (await contentElement.innerHTML()).trim(),
         link: normalisedLink,
-        retrieved: Date.now(),
+        retrieved: dateValue ?? Date.now(),
         image: normalisedImgSrc,
       };
     })
@@ -364,4 +390,26 @@ function getGithubPagesUrl(): string | undefined {
 
   const [owner, repository] = repositorySlug.split("/");
   return `https://${owner}.github.io/${repository}/`;
+}
+
+/**
+ * Parses the datetime attribute of <time>, as long as it's a date
+ * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/time#valid_datetime_values
+ */
+function parseDatetime(datetime: string): Date | null {
+  const parts = datetime.split("-");
+  if (parts.length < 3) {
+    return null;
+  }
+  if (parts[2].length > 2) {
+    // It's not just `DD-MM-YYYY`:
+    return parseIsoDate(datetime);
+  }
+  return new Date(
+    Date.UTC(
+      Number.parseInt(parts[0]),
+      Number.parseInt(parts[1]) - 1,
+      Number.parseInt(parts[2])
+    )
+  );
 }

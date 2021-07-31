@@ -61,7 +61,15 @@ it("can generate a feed where every element is also the link", async () => {
   expect(linkEntryFeed).toMatchSnapshot();
 });
 
-it("can generate a feed with the minimal configuration", async () => {
+it("can generate a feed with dates extracted from the content", async () => {
+  const dateFeed = await readFile(
+    resolve(__dirname, "../public/date.xml"),
+    "utf-8"
+  );
+  expect(dateFeed).toMatchSnapshot();
+});
+
+it("can generate a combined feed", async () => {
   const combinedFeed = await readFile(
     resolve(__dirname, "../public/all.xml"),
     "utf-8"

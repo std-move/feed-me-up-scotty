@@ -6,6 +6,11 @@ The following changes have been implemented but not released yet:
 
 ## [Unreleased]
 
+### New features
+
+- The publication date can now be extracted from the page using `dateSelector`
+  and `dateFormat`, thanks to @hawk01.
+
 The following sections document changes that have been released already:
 
 ## [1.4.0] - 2021-07-17
