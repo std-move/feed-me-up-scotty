@@ -6,12 +6,19 @@ The following changes have been implemented but not released yet:
 
 ## [Unreleased]
 
+The following sections document changes that have been released already:
+
+## [1.5.0] - 2021-08-03
+
 ### New features
 
 - The publication date can now be extracted from the page using `dateSelector`
   and `dateFormat`, thanks to @hawk01.
 
-The following sections document changes that have been released already:
+### Bugs fixed
+
+- Some links (specifically: links relative to the crawled page) were not
+  resolved correctly.
 
 ## [1.4.0] - 2021-07-17
 
