@@ -37,3 +37,10 @@ titleSelector = "h1"
 linkSelector = "a"
 dateSelector = "time"
 dateFormat = "yyyy-MM-dd"
+
+[relative-link]
+title = "Test fixture with relative links"
+url = "http://localhost:5000/relative/links.html"
+entrySelector = "a"
+titleSelector = "h1"
+linkSelector = "*"

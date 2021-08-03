@@ -124,6 +124,30 @@ exports[`can generate a combined feed 1`] = `
         <time datetime=\\"2011-11-18T14:54:39.929\\"> 18 November 2011 </time>
       </p>]]></content:encoded>
         </item>
+        <item>
+            <title><![CDATA[Here's a link that's relative to the page (Test fixture with relative links)]]></title>
+            <link>http://localhost:5000/relative/relative-to-page.html</link>
+            <guid>http://localhost:5000/relative/relative-to-page.html</guid>
+            <pubDate>Thu, 01 Jan 1970 00:00:00 GMT</pubDate>
+            <content:encoded><![CDATA[<h1>Here's a link that's relative to the page</h1>
+      <p>i.e. it does not start with a slash</p>]]></content:encoded>
+        </item>
+        <item>
+            <title><![CDATA[Here's a link that's relative to the origin (Test fixture with relative links)]]></title>
+            <link>http://localhost:5000/root.html</link>
+            <guid>http://localhost:5000/root.html</guid>
+            <pubDate>Thu, 01 Jan 1970 00:00:00 GMT</pubDate>
+            <content:encoded><![CDATA[<h1>Here's a link that's relative to the origin</h1>
+      <p>So it starts with a slash</p>]]></content:encoded>
+        </item>
+        <item>
+            <title><![CDATA[Here's an absolute link (Test fixture with relative links)]]></title>
+            <link>https://absolute-link.com/</link>
+            <guid>https://absolute-link.com/</guid>
+            <pubDate>Thu, 01 Jan 1970 00:00:00 GMT</pubDate>
+            <content:encoded><![CDATA[<h1>Here's an absolute link</h1>
+      <p>So it starts with http://</p>]]></content:encoded>
+        </item>
     </channel>
 </rss>"
 `;
@@ -261,6 +285,41 @@ exports[`can generate a feed with the minimal configuration 1`] = `
         <a href=\\"https://poop.bike\\">No, this is even better</a>
       </h1>
       <p>It really, really is.</p>]]></content>
+    </entry>
+</feed>"
+`;
+
+exports[`correctly resolves relative links 1`] = `
+"<?xml version=\\"1.0\\" encoding=\\"utf-8\\"?>
+<feed xmlns=\\"http://www.w3.org/2005/Atom\\">
+    <id>http://localhost:5000/relative/links.html</id>
+    <title>Test fixture with relative links</title>
+    <updated>1970-01-01T00:00:00.000Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <icon>http://localhost:5000/relative/favicon.ico</icon>
+    <entry>
+        <title type=\\"html\\"><![CDATA[Here's a link that's relative to the page]]></title>
+        <id>http://localhost:5000/relative/relative-to-page.html</id>
+        <link href=\\"http://localhost:5000/relative/relative-to-page.html\\"/>
+        <updated>1970-01-01T00:00:00.000Z</updated>
+        <content type=\\"html\\"><![CDATA[<h1>Here's a link that's relative to the page</h1>
+      <p>i.e. it does not start with a slash</p>]]></content>
+    </entry>
+    <entry>
+        <title type=\\"html\\"><![CDATA[Here's a link that's relative to the origin]]></title>
+        <id>http://localhost:5000/root.html</id>
+        <link href=\\"http://localhost:5000/root.html\\"/>
+        <updated>1970-01-01T00:00:00.000Z</updated>
+        <content type=\\"html\\"><![CDATA[<h1>Here's a link that's relative to the origin</h1>
+      <p>So it starts with a slash</p>]]></content>
+    </entry>
+    <entry>
+        <title type=\\"html\\"><![CDATA[Here's an absolute link]]></title>
+        <id>https://absolute-link.com/</id>
+        <link href=\\"https://absolute-link.com/\\"/>
+        <updated>1970-01-01T00:00:00.000Z</updated>
+        <content type=\\"html\\"><![CDATA[<h1>Here's an absolute link</h1>
+      <p>So it starts with http://</p>]]></content>
     </entry>
 </feed>"
 `;

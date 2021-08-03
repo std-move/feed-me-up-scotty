@@ -116,8 +116,6 @@ type FeedData = {
 async function fetchFeedData(config: FeedConfig): Promise<FeedData | null> {
   try {
     const firstUrl = Array.isArray(config.url) ? config.url[0] : config.url;
-    const url = new URL(firstUrl);
-    const origin = url.origin;
     const browser = await getBrowser();
     const context = await browser.newContext();
     const page = await context.newPage();
@@ -132,11 +130,11 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData | null> {
     const faviconPath = faviconElement
       ? (await faviconElement.getAttribute("href")) ?? "favicon.ico"
       : "favicon.ico";
-    const faviconUrl = new URL(faviconPath, origin).href;
+    const faviconUrl = new URL(faviconPath, firstUrl).href;
     const allUrls = Array.isArray(config.url) ? config.url : [config.url];
     const entries = await allUrls.reduce(async (accPromise, url) => {
       const acc = await accPromise;
-      const pageEntries = await fetchPageEntries(page, url, origin, config);
+      const pageEntries = await fetchPageEntries(page, url, firstUrl, config);
       return acc.concat(pageEntries);
     }, Promise.resolve([] as FeedData["elements"]));
 
@@ -174,7 +172,7 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData | null> {
 async function fetchPageEntries(
   page: Page,
   url: string,
-  origin: string,
+  baseUrl: string,
   config: FeedConfig
 ): Promise<FeedData["elements"]> {
   await page.goto(url, {
@@ -195,7 +193,7 @@ async function fetchPageEntries(
           : await entryElement.$(config.linkSelector);
       const linkValue = await linkElement?.getAttribute("href");
       const normalisedLink = linkValue
-        ? new URL(linkValue, origin).href
+        ? new URL(linkValue, baseUrl).href
         : undefined;
 
       const contentElement =
@@ -259,7 +257,7 @@ async function fetchPageEntries(
         // Skip the image.
       }
       const normalisedImgSrc = imageUrl
-        ? new URL(imageUrl, origin).href
+        ? new URL(imageUrl, baseUrl).href
         : undefined;
 
       return {

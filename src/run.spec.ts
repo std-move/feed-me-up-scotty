@@ -69,6 +69,14 @@ it("can generate a feed with dates extracted from the content", async () => {
   expect(dateFeed).toMatchSnapshot();
 });
 
+it("correctly resolves relative links", async () => {
+  const relativeLinksFeed = await readFile(
+    resolve(__dirname, "../public/relative-link.xml"),
+    "utf-8"
+  );
+  expect(relativeLinksFeed).toMatchSnapshot();
+});
+
 it("can generate a combined feed", async () => {
   const combinedFeed = await readFile(
     resolve(__dirname, "../public/all.xml"),
