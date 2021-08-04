@@ -21,9 +21,17 @@ async function getBrowser() {
 
 export async function run(configFilePath = "./feeds.toml"): Promise<void> {
   const feedConfigs = await loadFeedConfigs(configFilePath);
-  const feedsData = await (
-    await Promise.all(feedConfigs.map(fetchFeedData))
-  ).filter(isNotNull);
+  const feedsData: FeedData[] = await feedConfigs.reduce(
+    async (feedsDataPromise, feedConfig) => {
+      const feedsData = await feedsDataPromise;
+      const nextFeedData = await fetchFeedData(feedConfig);
+      if (isNotNull(nextFeedData)) {
+        feedsData.push(nextFeedData);
+      }
+      return feedsData;
+    },
+    Promise.resolve([] as FeedData[])
+  );
   const individualFeedPromises = feedsData.map((feedData, i) =>
     generateFeed(feedConfigs[i].id, feedData)
   );
