@@ -173,6 +173,7 @@ async function fetchPageEntries(
   baseUrl: string,
   config: FeedConfig
 ): Promise<FeedData["elements"]> {
+  console.log("Fetching", url, "for", config.id);
   await page.goto(url, {
     timeout: (config.timeout ?? 60) * 1000,
     waitUntil: config.waitUntil ?? "domcontentloaded",
