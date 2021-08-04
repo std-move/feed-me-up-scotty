@@ -153,6 +153,7 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData | null> {
         )
       : entries;
 
+    debug(`Fetched ${config.id}.`, "info");
     return {
       title: config.title ?? config.id,
       url: firstUrl,
@@ -162,12 +163,18 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData | null> {
   } catch (e: unknown) {
     if (config.onFail === "stale") {
       const existingFeedData = await fetchExistingFeedData(config.id);
-      console.log(`Could not fetch ${config.id}; preserving existing feed.`);
+      debug(
+        `Could not fetch ${config.id}; preserving existing feed.`,
+        "warning"
+      );
       return existingFeedData;
     }
 
     if (config.onFail === "exclude") {
-      console.log(`Could not fetch ${config.id}; not generating its feed.`);
+      debug(
+        `Could not fetch ${config.id}; not generating its feed.`,
+        "warning"
+      );
       return null;
     }
 
@@ -181,7 +188,7 @@ async function fetchPageEntries(
   baseUrl: string,
   config: FeedConfig
 ): Promise<FeedData["elements"]> {
-  console.log("Fetching", url, "for", config.id);
+  debug(`Fetching ${url} for ${config.id}`, "info");
   await page.goto(url, {
     timeout: (config.timeout ?? 60) * 1000,
     waitUntil: config.waitUntil ?? "domcontentloaded",
@@ -417,4 +424,24 @@ function parseDatetime(datetime: string): Date | null {
       Number.parseInt(parts[2])
     )
   );
+}
+
+function debug(
+  message: string,
+  logLevel: "info" | "warning" | "error" = "info"
+) {
+  const showLogsOfLevel: typeof logLevel =
+    (process.env.DEBUG as typeof logLevel | undefined) ?? "error";
+  if (showLogsOfLevel === "error" && logLevel === "error") {
+    console.log(message);
+  }
+  if (
+    showLogsOfLevel === "warning" &&
+    ["warning", "error"].includes(logLevel)
+  ) {
+    console.log(message);
+  }
+  if (showLogsOfLevel === "info") {
+    console.log(message);
+  }
 }
