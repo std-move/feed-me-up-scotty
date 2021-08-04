@@ -75,7 +75,7 @@ type FeedConfig = {
   waitForSelector?: string;
   /** This option is experimental, and may be removed at any time: */
   waitUntil?: NonNullable<Parameters<Page["goto"]>[1]>["waitUntil"];
-  /** This optino is experimental, and may be removed at any time: */
+  /** This option is experimental, and may be removed at any time: */
   onFail?: "error" | "stale" | "exclude";
 };
 
@@ -154,10 +154,8 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData | null> {
   } catch (e: unknown) {
     if (config.onFail === "stale") {
       const existingFeedData = await fetchExistingFeedData(config.id);
-      if (existingFeedData !== null) {
-        console.log(`Could not fetch ${config.id}; preserving existing feed.`);
-        return existingFeedData;
-      }
+      console.log(`Could not fetch ${config.id}; preserving existing feed.`);
+      return existingFeedData;
     }
 
     if (config.onFail === "exclude") {
