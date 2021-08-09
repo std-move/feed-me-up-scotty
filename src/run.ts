@@ -6,19 +6,6 @@ import { URL } from "url";
 import { parse as parseToml } from "@ltd/j-toml";
 import { parse as parseDate, parseISO as parseIsoDate } from "date-fns";
 
-let browser: Browser;
-let browsePromise: Promise<Browser>;
-async function getBrowser() {
-  if (typeof browser === "undefined") {
-    if (typeof browsePromise === "undefined") {
-      browsePromise = firefox.launch();
-    }
-    browser = await browsePromise;
-  }
-
-  return browser;
-}
-
 export async function run(configFilePath = "./feeds.toml"): Promise<void> {
   const feedConfigs = await loadFeedConfigs(configFilePath);
   const feedsData: FeedData[] = await feedConfigs.reduce(
@@ -40,8 +27,6 @@ export async function run(configFilePath = "./feeds.toml"): Promise<void> {
   await generateFeed("all", combinedFeedData);
   await Promise.all(individualFeedPromises);
 
-  const browser = await getBrowser();
-  await browser.close();
   console.log("Feeds generated in `public/`.");
   if (typeof getRootUrl() === "string") {
     console.log("\nThey will be published at:");
@@ -124,7 +109,7 @@ type FeedData = {
 async function fetchFeedData(config: FeedConfig): Promise<FeedData | null> {
   try {
     const firstUrl = Array.isArray(config.url) ? config.url[0] : config.url;
-    const browser = await getBrowser();
+    const browser = await firefox.launch();
     const context = await browser.newContext();
     const page = await context.newPage();
     await page.goto(firstUrl, {
@@ -145,6 +130,7 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData | null> {
       const pageEntries = await fetchPageEntries(page, url, firstUrl, config);
       return acc.concat(pageEntries);
     }, Promise.resolve([] as FeedData["elements"]));
+    await browser.close();
 
     const filters = config.filters;
     const filteredEntries = Array.isArray(filters)
