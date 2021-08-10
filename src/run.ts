@@ -1,4 +1,4 @@
-import { Browser, firefox, Page } from "playwright-firefox";
+import { firefox, Page } from "playwright-firefox";
 import { Feed } from "feed";
 import { writeFile, mkdir, readFile } from "fs/promises";
 import fetch from "node-fetch";
@@ -107,9 +107,9 @@ type FeedData = {
 };
 
 async function fetchFeedData(config: FeedConfig): Promise<FeedData | null> {
+  const browser = await firefox.launch();
   try {
     const firstUrl = Array.isArray(config.url) ? config.url[0] : config.url;
-    const browser = await firefox.launch();
     const context = await browser.newContext();
     const page = await context.newPage();
     await page.goto(firstUrl, {
@@ -130,7 +130,6 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData | null> {
       const pageEntries = await fetchPageEntries(page, url, firstUrl, config);
       return acc.concat(pageEntries);
     }, Promise.resolve([] as FeedData["elements"]));
-    await browser.close();
 
     const filters = config.filters;
     const filteredEntries = Array.isArray(filters)
@@ -165,6 +164,8 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData | null> {
     }
 
     throw e;
+  } finally {
+    await browser.close();
   }
 }
 
