@@ -15,6 +15,9 @@ resulting feed using GitHub Pages.
 2. In your fork, edit `feeds.toml` to provide your desired data sources.
 3. Create a new branch called `gh-pages`.
 4. Under the _Actions_ tab, enable Workflows for your fork.
+5. Make sure the Publishing Source for your GitHub Pages site is set to the
+   `gh-pages` branch.
+   [Instructions here.](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)
 
 GitHub Actions will then automatically run twice a day to check for updates,
 and publish your feeds at `https://<username>.github.io/feeds/<feedname>.xml`.
