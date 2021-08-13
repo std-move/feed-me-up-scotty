@@ -130,3 +130,38 @@ Optional, [array](https://toml.io/en/v1.0.0#array) of
 
 If set, entries containing one or more of the given strings will not be
 included. For example, `["Next page"]`.
+
+# Experimental fields
+
+The following fields are experimental and may be removed or changed in a future
+version. They can help dealing with unstable feed sources.
+
+## `onFail`
+
+Optional, one of `"error"` (default), `"stale"`, or `"exclude"`.
+
+What to do when fetching a feed source failed. Possible values:
+
+- `"error"`: default, throw an error and abort the feed generation.
+- `"stale"`: don't update this feed, but preserve a previously-fetched feed if
+  available.
+- `"skip"`: don't update this feed, and don't preserve previously fetched feeds.
+
+## `waitUntil`
+
+Optional, one of `"domcontentloaded"` (default), `"load"`, or `"networkidle"`
+
+When to consider the page loaded. This is useful for sites that first return an
+empty page, and then execute some JavaScript after the fact to add the content
+you want to see in your feed.
+
+See https://playwright.dev/docs/api/class-page#page-goto-option-wait-until for
+documentation on the different options.
+
+## `waitForSelector`
+
+Optional, [string](https://toml.io/en/v1.0.0#string).
+
+Can be used to provide a selector that indicates when the page is fully loaded.
+If set, _Feed me up, Scotty!_ will start looking for the feed content only when
+a matching element is added to the page.
