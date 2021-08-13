@@ -8,6 +8,12 @@ The following changes have been implemented but not released yet:
 
 The following sections document changes that have been released already:
 
+## [1.5.1] - 2021-08-13
+
+### Bugs fixed
+
+- Some internal changes should make _Feed me up, Scotty!_ more stable.
+
 ## [1.5.0] - 2021-08-03
 
 ### New features
