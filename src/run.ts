@@ -327,6 +327,10 @@ async function reconcileDates(
     return feedData;
   }
 
+  debug(
+    `Found previously generated feed for ${feedId}; preserving publication dates of previously-published entries.`,
+    "info"
+  );
   const newElements = feedData.elements.map((element) => {
     const existingElement = existingFeedData.elements.find(
       (el) => typeof el.link === "string" && el.link === element.link
