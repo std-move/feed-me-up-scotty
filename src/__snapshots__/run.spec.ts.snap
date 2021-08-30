@@ -109,6 +109,18 @@ exports[`can generate a combined feed 1`] = `
             <content:encoded><![CDATA[<h1>Here's an absolute link</h1>
       <p>So it starts with http://</p>]]></content:encoded>
         </item>
+        <item>
+            <title><![CDATA[Does not contain filtered words, one of the oneOf matchers, and all of the allOf matchers (Test fixture with filtered and matched words)]]></title>
+            <link>https://feed-me-up-scotty.vincenttunru.com/</link>
+            <guid>https://feed-me-up-scotty.vincenttunru.com/</guid>
+            <pubDate>Thu, 01 Jan 1970 00:00:00 GMT</pubDate>
+            <content:encoded><![CDATA[<h1>
+        <a href=\\"https://feed-me-up-scotty.vincenttunru.com\\">Does not contain filtered words, one of the oneOf matchers, and all of the allOf matchers</a>
+      </h1>
+      <p>
+        MatchEitherMe MatchBothMe AndMatchMe
+      </p>]]></content:encoded>
+        </item>
     </channel>
 </rss>"
 `;
@@ -246,6 +258,29 @@ exports[`can generate a feed with the minimal configuration 1`] = `
         <a href=\\"https://poop.bike\\">No, this is even better</a>
       </h1>
       <p>It really, really is.</p>]]></content>
+    </entry>
+</feed>"
+`;
+
+exports[`correctly filters out entries matching filters and not matching matchers 1`] = `
+"<?xml version=\\"1.0\\" encoding=\\"utf-8\\"?>
+<feed xmlns=\\"http://www.w3.org/2005/Atom\\">
+    <id>http://localhost:5000/matches.html</id>
+    <title>Test fixture with filtered and matched words</title>
+    <updated>1970-01-01T00:00:00.000Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <icon>http://localhost:5000/favicon.ico</icon>
+    <entry>
+        <title type=\\"html\\"><![CDATA[Does not contain filtered words, one of the oneOf matchers, and all of the allOf matchers]]></title>
+        <id>https://feed-me-up-scotty.vincenttunru.com/</id>
+        <link href=\\"https://feed-me-up-scotty.vincenttunru.com/\\"/>
+        <updated>1970-01-01T00:00:00.000Z</updated>
+        <content type=\\"html\\"><![CDATA[<h1>
+        <a href=\\"https://feed-me-up-scotty.vincenttunru.com\\">Does not contain filtered words, one of the oneOf matchers, and all of the allOf matchers</a>
+      </h1>
+      <p>
+        MatchEitherMe MatchBothMe AndMatchMe
+      </p>]]></content>
     </entry>
 </feed>"
 `;

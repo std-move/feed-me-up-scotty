@@ -79,6 +79,14 @@ it("correctly resolves relative links", async () => {
   expect(relativeLinksFeed).toMatchSnapshot();
 });
 
+it("correctly filters out entries matching filters and not matching matchers", async () => {
+  const matchesFeed = await readFile(
+    resolve(__dirname, "../public/matches.xml"),
+    "utf-8"
+  );
+  expect(matchesFeed).toMatchSnapshot();
+});
+
 it("can generate a combined feed", async () => {
   const combinedFeed = await readFile(
     resolve(__dirname, "../public/all.xml"),
