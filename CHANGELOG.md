@@ -6,12 +6,14 @@ The following changes have been implemented but not released yet:
 
 ## [Unreleased]
 
+The following sections document changes that have been released already:
+
+## [1.5.3] - 2021-08-30
+
 ### Bugs fixed
 
 - When errors occur generating a feed, Feed me up, Scotty! now exits with a
   non-zero exit code.
-
-The following sections document changes that have been released already:
 
 ## [1.5.2] - 2021-08-23
 
