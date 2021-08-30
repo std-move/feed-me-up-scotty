@@ -99,6 +99,8 @@ matching the element inside individual feed entries containing that entry's
 content. For example, `p.lead`. If not provided, the entry as a whole will be
 used as the content.
 
+Available since version: **1.2.0**.
+
 ## `dateSelector`
 
 Optional, [string](https://toml.io/en/v1.0.0#string).
@@ -109,6 +111,8 @@ matching the element inside individual feed entries containing that entry's
 publication date. For example, `time`. If not provided, the date the feed was
 generated will be used as the publication time.
 
+Available since version: **1.5.0**.
+
 ## `dateFormat`
 
 Optional, [string](https://toml.io/en/v1.0.0#string).
@@ -116,6 +120,8 @@ Optional, [string](https://toml.io/en/v1.0.0#string).
 Used in combination with `dateSelector`.
 [Format string as understood by `date-fns`](https://date-fns.org/v2.23.0/docs/parse)
 that describes the format of the date in the element matched by `dateSelector`.
+
+Available since version: **1.5.0**.
 
 ## `timeout`
 
@@ -130,6 +136,26 @@ Optional, [array](https://toml.io/en/v1.0.0#array) of
 
 If set, entries containing one or more of the given strings will not be
 included. For example, `["Next page"]`.
+
+## `matchOneOf`
+
+Optional, [array](https://toml.io/en/v1.0.0#array) of
+[strings](https://toml.io/en/v1.0.0#string).
+
+If set, only entries containing one or more of the given strings will be
+included. For example, `["New", "Available"]`.
+
+Available since version: **Not released yet.**.
+
+## `matchAllOf`
+
+Optional, [array](https://toml.io/en/v1.0.0#array) of
+[strings](https://toml.io/en/v1.0.0#string).
+
+If set, only entries containing all of the given strings will be included. For
+example, `["Verified", "HD"]`.
+
+Available since version: **Not released yet.**.
 
 # Experimental fields
 

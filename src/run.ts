@@ -63,6 +63,8 @@ type FeedConfig = {
   dateFormat?: string;
   imageSelector?: string;
   filters?: string[];
+  matchOneOf?: string[];
+  matchAllOf?: string[];
   timeout?: number;
   /** This option is experimental, and may be removed at any time: */
   waitForSelector?: string;
@@ -137,13 +139,25 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData | null> {
           filters.every((filter) => !entry.contents.includes(filter))
         )
       : entries;
+    const oneOfMatchers = config.matchOneOf;
+    const matchedOneEntries = Array.isArray(oneOfMatchers)
+      ? filteredEntries.filter((entry) =>
+          oneOfMatchers.some((matcher) => entry.contents.includes(matcher))
+        )
+      : filteredEntries;
+    const allOfMatchers = config.matchAllOf;
+    const matchedAllEntries = Array.isArray(allOfMatchers)
+      ? matchedOneEntries.filter((entry) =>
+          allOfMatchers.every((matcher) => entry.contents.includes(matcher))
+        )
+      : matchedOneEntries;
 
     debug(`Fetched ${config.id}.`, "info");
     return {
       title: config.title ?? config.id,
       url: firstUrl,
       favicon: faviconUrl,
-      elements: filteredEntries,
+      elements: matchedAllEntries,
     };
   } catch (e: unknown) {
     if (config.onFail === "stale") {

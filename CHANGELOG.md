@@ -6,6 +6,12 @@ The following changes have been implemented but not released yet:
 
 ## [Unreleased]
 
+### New features
+
+- `matchOneOf` and `matchAllOf` options that complement the `filters` option:
+  allows you to only include entries that have one of or all of the given
+  words, respectively.
+
 The following sections document changes that have been released already:
 
 ## [1.5.3] - 2021-08-30

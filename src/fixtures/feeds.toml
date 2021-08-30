@@ -46,3 +46,13 @@ url = "http://localhost:5000/relative/links.html"
 entrySelector = "a"
 titleSelector = "h1"
 linkSelector = "*"
+
+[matches]
+title = "Test fixture with filtered and matched words"
+url = "http://localhost:5000/matches.html"
+entrySelector = "article"
+titleSelector = "h1"
+linkSelector = "a"
+filters = ["FilterMeOut", "AndFilterMeOut"]
+matchOneOf = ["MatchEitherMe", "OrMatchMe"]
+matchAllOf = ["MatchBothMe", "AndMatchMe"]

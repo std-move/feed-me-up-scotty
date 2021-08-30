@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Maximal HTML page with feed elements</title>
+  </head>
+  <body>
+    <article>
+      <h1>
+        <a href="https://feed-me-up-scotty.vincenttunru.com"
+          >Does not contain filtered words, one of the oneOf matchers, and all
+          of the allOf matchers</a
+        >
+      </h1>
+      <p>MatchEitherMe MatchBothMe AndMatchMe</p>
+    </article>
+    <article>
+      <h1>
+        <a href="https://poop.bike"
+          >Does contain one of the filtered words, and also one of the oneOf
+          matchers and all of the allOf matchers</a
+        >
+      </h1>
+      <p>FilterMeOut MatchEitherMe MatchBothMe AndMatchMe</p>
+    </article>
+    <article>
+      <h1>
+        <a href="https://html5zombo.com"
+          >Does not contain filtered words, and all of the allOf matchers, but
+          none of the oneOf matchers</a
+        >
+      </h1>
+      <p>MatchBothMe AndMatchMe</p>
+    </article>
+    <article>
+      <h1>
+        <a href="https://makeapoint.vincenttunru.com/"
+          >Does not contain filtered words, and one of the oneOf matchers, but
+          not all of the allOf matchers</a
+        >
+      </h1>
+      <p>MatchEitherMe AndMatchMe</p>
+    </article>
+  </body>
+</html>
