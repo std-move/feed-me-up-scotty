@@ -145,7 +145,7 @@ Optional, [array](https://toml.io/en/v1.0.0#array) of
 If set, only entries containing one or more of the given strings will be
 included. For example, `["New", "Available"]`.
 
-Available since version: **Not released yet.**.
+Available since version: **1.6.0.**.
 
 ## `matchAllOf`
 
@@ -155,7 +155,7 @@ Optional, [array](https://toml.io/en/v1.0.0#array) of
 If set, only entries containing all of the given strings will be included. For
 example, `["Verified", "HD"]`.
 
-Available since version: **Not released yet.**.
+Available since version: **1.6.0.**.
 
 # Experimental fields
 
