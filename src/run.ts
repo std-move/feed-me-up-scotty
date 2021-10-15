@@ -133,6 +133,8 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData | null> {
       return acc.concat(pageEntries);
     }, Promise.resolve([] as FeedData["elements"]));
 
+    debug(`Fetched ${config.id} (${entries.length} entries).`, "info");
+
     const filters = config.filters;
     const filteredEntries = Array.isArray(filters)
       ? entries.filter((entry) =>
@@ -152,7 +154,10 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData | null> {
         )
       : matchedOneEntries;
 
-    debug(`Fetched ${config.id}.`, "info");
+    debug(
+      `Applied filters and matchers to ${config.id}, final count: ${matchedAllEntries.length} entries.`,
+      "info"
+    );
     return {
       title: config.title ?? config.id,
       url: firstUrl,
