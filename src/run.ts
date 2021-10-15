@@ -440,18 +440,19 @@ function debug(
   message: string,
   logLevel: "info" | "warning" | "error" = "info"
 ) {
+  const messageWithTimestamp = `[${new Date().toISOString()}] ${message}`;
   const showLogsOfLevel: typeof logLevel =
     (process.env.DEBUG as typeof logLevel | undefined) ?? "error";
   if (showLogsOfLevel === "error" && logLevel === "error") {
-    console.log(message);
+    console.log(messageWithTimestamp);
   }
   if (
     showLogsOfLevel === "warning" &&
     ["warning", "error"].includes(logLevel)
   ) {
-    console.log(message);
+    console.log(messageWithTimestamp);
   }
   if (showLogsOfLevel === "info") {
-    console.log(message);
+    console.log(messageWithTimestamp);
   }
 }
