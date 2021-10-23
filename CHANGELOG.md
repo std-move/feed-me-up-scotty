@@ -12,6 +12,11 @@ The following changes have been implemented but not released yet:
 - When run with `$DEBUG="info"`, entry counts before and after applying filters
   and matchers are displayed.
 
+### Bugs fixed
+
+- When existing feed data could not successfully be fetched, an error would be
+  thrown. Now, the feed is just regenerated.
+
 The following sections document changes that have been released already:
 
 ## [1.6.0] - 2021-08-31

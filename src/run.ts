@@ -379,14 +379,23 @@ async function fetchExistingFeedData(feedId: string): Promise<FeedData | null> {
   if (typeof rootUrl !== "string") {
     return null;
   }
-  const response = await fetch(`${rootUrl}${feedId}.json`);
-  if (!response.ok) {
+  try {
+    const response = await fetch(`${rootUrl}${feedId}.json`);
+    if (!response.ok) {
+      return null;
+    }
+
+    const existingData: FeedData = await response.json();
+    existingFeedData[feedId] = existingData;
+    return existingData;
+  } catch (e: unknown) {
+    const message =
+      e instanceof Error
+        ? `Encountered error fetching existing feed for ${feedId}:` + e.message
+        : `Encountered error fetching existing feed for ${feedId}.`;
+    debug(message, "warning");
     return null;
   }
-
-  const existingData: FeedData = await response.json();
-  existingFeedData[feedId] = existingData;
-  return existingData;
 }
 
 function getRootUrl(): string | undefined {
