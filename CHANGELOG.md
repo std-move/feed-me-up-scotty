@@ -6,6 +6,10 @@ The following changes have been implemented but not released yet:
 
 ## [Unreleased]
 
+The following sections document changes that have been released already:
+
+## [1.7.0] - 2021-10-23
+
 ### New features
 
 - Debug logs now include timestamps.
@@ -16,8 +20,6 @@ The following changes have been implemented but not released yet:
 
 - When existing feed data could not successfully be fetched, an error would be
   thrown. Now, the feed is just regenerated.
-
-The following sections document changes that have been released already:
 
 ## [1.6.0] - 2021-08-31
 
