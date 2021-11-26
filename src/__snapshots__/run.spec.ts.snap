@@ -11,7 +11,7 @@ exports[`can generate a combined feed 1`] = `
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <item>
-            <title><![CDATA[Feed me up, Scotty! is the best! (Maximal test fixture)]]></title>
+            <title><![CDATA[Feed me up, Scotty! is the best! (Minimal test fixture)]]></title>
             <link>https://feed-me-up-scotty.vincenttunru.com/</link>
             <guid>https://feed-me-up-scotty.vincenttunru.com/</guid>
             <pubDate>Thu, 01 Jan 1970 00:00:00 GMT</pubDate>
@@ -21,7 +21,7 @@ exports[`can generate a combined feed 1`] = `
       <p>It really is.</p>]]></content:encoded>
         </item>
         <item>
-            <title><![CDATA[No, this is even better (Maximal test fixture)]]></title>
+            <title><![CDATA[No, this is even better (Minimal test fixture)]]></title>
             <link>https://poop.bike/</link>
             <guid>https://poop.bike/</guid>
             <pubDate>Thu, 01 Jan 1970 00:00:00 GMT</pubDate>
@@ -235,7 +235,7 @@ exports[`can generate a feed with the minimal configuration 1`] = `
 "<?xml version=\\"1.0\\" encoding=\\"utf-8\\"?>
 <feed xmlns=\\"http://www.w3.org/2005/Atom\\">
     <id>http://localhost:5000/minimal.html</id>
-    <title>Maximal test fixture</title>
+    <title>Minimal test fixture</title>
     <updated>1970-01-01T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <icon>http://localhost:5000/favicon.ico</icon>

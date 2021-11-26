@@ -1,5 +1,5 @@
 [minimal]
-title = "Maximal test fixture"
+title = "Minimal test fixture"
 url = "http://localhost:5000/minimal.html"
 entrySelector = "article"
 titleSelector = "h1"
