@@ -66,7 +66,7 @@ Required, [string](https://toml.io/en/v1.0.0#string).
 [CSS
 Selector](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Selectors)
 matching the elements that contain individual feed entries. For example,
-`article`.
+`"article"`.
 
 ## `titleSelector`
 
@@ -76,7 +76,7 @@ Required, [string](https://toml.io/en/v1.0.0#string) or [array](https://toml.io/
 [CSS
 Selector](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Selectors)
 matching the element inside individual feed entries containing that entry's
-title. For example, `h2`.
+title. For example, `"h2"` or `["h2", ".price"]`.
 
 If provided with an array of CSS Selectors, the contents of the matching elements
 will be joined together by spaces (` `).
@@ -88,7 +88,7 @@ Required, [string](https://toml.io/en/v1.0.0#string).
 [CSS
 Selector](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Selectors)
 matching the `<a>` element inside individual feed entries containing the link
-to view that entry in your browser. For example, `a.permalink`.
+to view that entry in your browser. For example, `"a.permalink"`.
 
 Set it to `*` if the link is to be found on the element matched by
 `entrySelector`.
@@ -101,8 +101,8 @@ Optional, [string](https://toml.io/en/v1.0.0#string) or [array](https://toml.io/
 [CSS
 Selector](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Selectors)
 matching the element inside individual feed entries containing that entry's
-content. For example, `p.lead`. If not provided, the entry as a whole will be
-used as the content.
+content. For example, `"p.lead"`, or `[".image", ".caption"]`. If not provided,
+the entry as a whole will be used as the content.
 
 If provided with an array of CSS Selectors, the contents of the matching elements
 will be joined together by spaces (` `).
@@ -116,7 +116,7 @@ Optional, [string](https://toml.io/en/v1.0.0#string).
 [CSS
 Selector](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Selectors)
 matching the element inside individual feed entries containing that entry's
-publication date. For example, `time`. If not provided, the date the feed was
+publication date. For example, `"time"`. If not provided, the date the feed was
 generated will be used as the publication time.
 
 Available since version: **1.5.0**.
