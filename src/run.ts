@@ -4,8 +4,7 @@ import { writeFile, mkdir, readFile } from "fs/promises";
 import fetch from "node-fetch";
 import { URL } from "url";
 import { parse as parseToml } from "@ltd/j-toml";
-import { parse as parseDate, parseISO as parseIsoDate } from "date-fns";
-import { ElementHandleForTag } from "playwright-firefox/types/structs";
+import { getContents, getDate, getImage, getLink, getTitle } from "./parse";
 
 export async function run(configFilePath = "./feeds.toml"): Promise<void> {
   const feedConfigs = await loadFeedConfigs(configFilePath);
@@ -52,7 +51,7 @@ async function generateFeed(feedId: string, feedData: FeedData) {
   );
 }
 
-type FeedConfig = {
+export type FeedConfig = {
   id: string;
   url: string | string[];
   title?: string;
@@ -96,7 +95,7 @@ async function loadFeedConfigs(configFilePath: string): Promise<FeedConfig[]> {
   });
 }
 
-type FeedData = {
+export type FeedData = {
   title: string;
   url: string;
   favicon?: string;
@@ -221,113 +220,6 @@ async function fetchPageEntries(
   );
 
   return entries;
-}
-
-async function getTitle(
-  entryElement: ElementHandleForTag<string>,
-  titleSelector: FeedConfig["titleSelector"]
-): Promise<FeedData["elements"][0]["title"]> {
-  const titleElement = await entryElement.$(titleSelector);
-  return (await titleElement?.textContent())?.trim() ?? undefined;
-}
-
-async function getLink(
-  entryElement: ElementHandleForTag<string>,
-  linkSelector: FeedConfig["linkSelector"],
-  baseUrl: string
-): Promise<FeedData["elements"][0]["link"]> {
-  const linkElement =
-    linkSelector === "*" ? entryElement : await entryElement.$(linkSelector);
-  const linkValue = await linkElement?.getAttribute("href");
-  const normalisedLink = linkValue
-    ? new URL(linkValue, baseUrl).href
-    : undefined;
-  return normalisedLink;
-}
-
-async function getContents(
-  entryElement: ElementHandleForTag<string>,
-  contentSelector: FeedConfig["contentSelector"]
-): Promise<FeedData["elements"][0]["contents"]> {
-  const contentElement =
-    typeof contentSelector === "string"
-      ? (await entryElement.$(contentSelector)) ?? entryElement
-      : entryElement;
-  return (await contentElement.innerHTML()).trim();
-}
-
-async function getDate(
-  entryElement: ElementHandleForTag<string>,
-  dateSelector: FeedConfig["dateSelector"],
-  dateFormat: FeedConfig["dateFormat"]
-): Promise<FeedData["elements"][0]["retrieved"]> {
-  const dateElement =
-    typeof dateSelector === "string"
-      ? await entryElement.$(dateSelector)
-      : undefined;
-  const datetimeAttribute = await dateElement?.getAttribute("datetime");
-  const dateElementContent = await dateElement?.textContent();
-  let dateValue: number | undefined = undefined;
-  if (typeof datetimeAttribute === "string") {
-    dateValue = parseDatetime(datetimeAttribute)?.getTime();
-  } else if (
-    typeof dateElementContent === "string" &&
-    typeof dateFormat === "string"
-  ) {
-    dateValue = parseDate(
-      dateElementContent.trim(),
-      dateFormat,
-      new Date(Date.now())
-    ).getTime();
-  }
-  if (Number.isNaN(dateValue)) {
-    dateValue = undefined;
-  }
-
-  return dateValue ?? Date.now();
-}
-
-async function getImage(
-  entryElement: ElementHandleForTag<string>,
-  imageSelector: FeedConfig["imageSelector"],
-  baseUrl: string
-): Promise<FeedData["elements"][0]["title"]> {
-  const imageElement =
-    typeof imageSelector === "string"
-      ? await entryElement.$(imageSelector)
-      : undefined;
-  let imageUrl = await imageElement?.getAttribute("src");
-  try {
-    if (imageSelector && typeof imageUrl !== "string") {
-      const backgroundImageValue = await entryElement.$eval(
-        imageSelector,
-        (el) => el.style["background-image"]
-      );
-      if (
-        typeof backgroundImageValue === "string" &&
-        backgroundImageValue.substring(0, "url(".length) === "url(" &&
-        backgroundImageValue.charAt(backgroundImageValue.length - 1) === ")"
-      ) {
-        const urlValue = backgroundImageValue.substring(
-          "url(".length,
-          backgroundImageValue.length - 1
-        );
-        const urlValueWithoutQuotes =
-          urlValue.charAt(0) === '"' || urlValue.charAt(0) === "'"
-            ? urlValue.substring(1, urlValue.length - 1)
-            : urlValue;
-        const url = new URL(urlValueWithoutQuotes);
-        imageUrl = url.href;
-      }
-    }
-  } catch (e) {
-    // No image element found, or not in a URL format we understand.
-    // Skip the image.
-  }
-  const normalisedImgSrc = imageUrl
-    ? new URL(imageUrl, baseUrl).href
-    : undefined;
-  return normalisedImgSrc;
 }
 
 function combineFeedData(feedsData: FeedData[]): FeedData {
@@ -458,28 +350,6 @@ function getGithubPagesUrl(): string | undefined {
 
   const [owner, repository] = repositorySlug.split("/");
   return `https://${owner}.github.io/${repository}/`;
-}
-
-/**
- * Parses the datetime attribute of <time>, as long as it's a date
- * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/time#valid_datetime_values
- */
-function parseDatetime(datetime: string): Date | null {
-  const parts = datetime.split("-");
-  if (parts.length < 3) {
-    return null;
-  }
-  if (parts[2].length > 2) {
-    // It's not just `DD-MM-YYYY`:
-    return parseIsoDate(datetime);
-  }
-  return new Date(
-    Date.UTC(
-      Number.parseInt(parts[0]),
-      Number.parseInt(parts[1]) - 1,
-      Number.parseInt(parts[2])
-    )
-  );
 }
 
 function debug(
