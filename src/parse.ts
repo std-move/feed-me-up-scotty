@@ -7,6 +7,15 @@ export async function getTitle(
   entryElement: ElementHandleForTag<string>,
   titleSelector: FeedConfig["titleSelector"]
 ): Promise<FeedData["elements"][0]["title"]> {
+  if (Array.isArray(titleSelector)) {
+    return (
+      await Promise.all(
+        titleSelector.map((singleSelector) =>
+          getTitle(entryElement, singleSelector)
+        )
+      )
+    ).join(" ");
+  }
   const titleElement = await entryElement.$(titleSelector);
   return (await titleElement?.textContent())?.trim() ?? undefined;
 }
@@ -29,6 +38,15 @@ export async function getContents(
   entryElement: ElementHandleForTag<string>,
   contentSelector: FeedConfig["contentSelector"]
 ): Promise<FeedData["elements"][0]["contents"]> {
+  if (Array.isArray(contentSelector)) {
+    return (
+      await Promise.all(
+        contentSelector.map((singleSelector) =>
+          getTitle(entryElement, singleSelector)
+        )
+      )
+    ).join(" ");
+  }
   const contentElement =
     typeof contentSelector === "string"
       ? (await entryElement.$(contentSelector)) ?? entryElement

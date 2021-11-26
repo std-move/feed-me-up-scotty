@@ -56,3 +56,11 @@ linkSelector = "a"
 filters = ["FilterMeOut", "AndFilterMeOut"]
 matchOneOf = ["MatchEitherMe", "OrMatchMe"]
 matchAllOf = ["MatchBothMe", "AndMatchMe"]
+
+[join-elements]
+title = "Test fixture with titles and contents spread over multiple elements"
+url = "http://localhost:5000/join-elements.html"
+entrySelector = "article"
+titleSelector = ["h1", "h2"]
+linkSelector = "a"
+contentSelector = ["p:nth-last-child(2)", "p:last-child"]

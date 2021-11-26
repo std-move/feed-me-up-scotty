@@ -56,9 +56,9 @@ export type FeedConfig = {
   url: string | string[];
   title?: string;
   entrySelector: string;
-  titleSelector: string;
+  titleSelector: string | string[];
   linkSelector: string;
-  contentSelector?: string;
+  contentSelector?: string | string[];
   dateSelector?: string;
   dateFormat?: string;
   imageSelector?: string;

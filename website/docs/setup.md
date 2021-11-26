@@ -70,12 +70,16 @@ matching the elements that contain individual feed entries. For example,
 
 ## `titleSelector`
 
-Required, [string](https://toml.io/en/v1.0.0#string).
+Required, [string](https://toml.io/en/v1.0.0#string) or [array](https://toml.io/en/v1.0.0#array) of
+[strings](https://toml.io/en/v1.0.0#string).
 
 [CSS
 Selector](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Selectors)
 matching the element inside individual feed entries containing that entry's
 title. For example, `h2`.
+
+If provided with an array of CSS Selectors, the contents of the matching elements
+will be joined together by spaces (` `).
 
 ## `linkSelector`
 
@@ -91,13 +95,17 @@ Set it to `*` if the link is to be found on the element matched by
 
 ## `contentSelector`
 
-Optional, [string](https://toml.io/en/v1.0.0#string).
+Optional, [string](https://toml.io/en/v1.0.0#string) or [array](https://toml.io/en/v1.0.0#array) of
+[strings](https://toml.io/en/v1.0.0#string).
 
 [CSS
 Selector](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Selectors)
 matching the element inside individual feed entries containing that entry's
 content. For example, `p.lead`. If not provided, the entry as a whole will be
 used as the content.
+
+If provided with an array of CSS Selectors, the contents of the matching elements
+will be joined together by spaces (` `).
 
 Available since version: **1.2.0**.
 
