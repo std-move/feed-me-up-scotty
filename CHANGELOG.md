@@ -6,6 +6,11 @@ The following changes have been implemented but not released yet:
 
 ## [Unreleased]
 
+### New features
+
+- `titleSelector` and `contentSelector` now also accept arrays, in case you want
+  to join several elements together.
+
 The following sections document changes that have been released already:
 
 ## [1.7.0] - 2021-10-23
