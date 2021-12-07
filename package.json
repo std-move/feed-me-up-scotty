@@ -1,6 +1,6 @@
 {
   "name": "feed-me-up-scotty",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "description": "RSS feeds for arbitrary websites, using CSS selectors",
   "main": "src/index.ts",
   "bin": "dist/index.js",
