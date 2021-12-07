@@ -23,7 +23,7 @@ build_website:
       - website/build
 
 test:
-  image: mcr.microsoft.com/playwright
+  image: mcr.microsoft.com/playwright:v1.12.3-focal
   stage: test
   dependencies:
     - build
@@ -31,7 +31,6 @@ test:
     # Explicitly install Playwright to run the postinstall script
     # to download Firefox - it's not included in the previous job's artefacts.
     - npm install playwright-firefox
-    - npx playwright install
     - npm test
 
 deploy_website:

@@ -8,6 +8,13 @@ The following changes have been implemented but not released yet:
 
 The following sections document changes that have been released already:
 
+## [1.8.1] - 2021-12-07
+
+### Bugs fixed
+
+- 1.8.0 would trigger "Module not found" errors; reverted back to 1.7.0. See
+  https://gitlab.com/vincenttunru/feed-me-up-scotty/-/issues/8.
+
 ## [1.8.0] - 2021-12-06
 
 ### New features

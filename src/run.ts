@@ -4,7 +4,7 @@ import { writeFile, mkdir, readFile } from "fs/promises";
 import fetch from "node-fetch";
 import { URL } from "url";
 import { parse as parseToml } from "@ltd/j-toml";
-import { getContents, getDate, getImage, getLink, getTitle } from "./parse";
+import { parse as parseDate, parseISO as parseIsoDate } from "date-fns";
 
 export async function run(configFilePath = "./feeds.toml"): Promise<void> {
   const feedConfigs = await loadFeedConfigs(configFilePath);
@@ -51,14 +51,14 @@ async function generateFeed(feedId: string, feedData: FeedData) {
   );
 }
 
-export type FeedConfig = {
+type FeedConfig = {
   id: string;
   url: string | string[];
   title?: string;
   entrySelector: string;
-  titleSelector: string | string[];
+  titleSelector: string;
   linkSelector: string;
-  contentSelector?: string | string[];
+  contentSelector?: string;
   dateSelector?: string;
   dateFormat?: string;
   imageSelector?: string;
@@ -95,7 +95,7 @@ async function loadFeedConfigs(configFilePath: string): Promise<FeedConfig[]> {
   });
 }
 
-export type FeedData = {
+type FeedData = {
   title: string;
   url: string;
   favicon?: string;
@@ -205,16 +205,87 @@ async function fetchPageEntries(
   const entriesElements = await page.$$(config.entrySelector);
   const entries: FeedData["elements"] = await Promise.all(
     entriesElements.map(async (entryElement) => {
+      const titleElement = await entryElement.$(config.titleSelector);
+
+      const linkElement =
+        config.linkSelector === "*"
+          ? entryElement
+          : await entryElement.$(config.linkSelector);
+      const linkValue = await linkElement?.getAttribute("href");
+      const normalisedLink = linkValue
+        ? new URL(linkValue, baseUrl).href
+        : undefined;
+
+      const contentElement =
+        typeof config.contentSelector === "string"
+          ? (await entryElement.$(config.contentSelector)) ?? entryElement
+          : entryElement;
+
+      const dateElement =
+        typeof config.dateSelector === "string"
+          ? await entryElement.$(config.dateSelector)
+          : undefined;
+      const datetimeAttribute = await dateElement?.getAttribute("datetime");
+      const dateElementContent = await dateElement?.textContent();
+      let dateValue: number | undefined = undefined;
+      if (typeof datetimeAttribute === "string") {
+        dateValue = parseDatetime(datetimeAttribute)?.getTime();
+      } else if (
+        typeof dateElementContent === "string" &&
+        typeof config.dateFormat === "string"
+      ) {
+        dateValue = parseDate(
+          dateElementContent.trim(),
+          config.dateFormat,
+          new Date(Date.now())
+        ).getTime();
+      }
+      if (Number.isNaN(dateValue)) {
+        dateValue = undefined;
+      }
+
+      const imageElement =
+        typeof config.imageSelector === "string"
+          ? await entryElement.$(config.imageSelector)
+          : undefined;
+      let imageUrl = await imageElement?.getAttribute("src");
+      try {
+        if (config.imageSelector && typeof imageUrl !== "string") {
+          const backgroundImageValue = await entryElement.$eval(
+            config.imageSelector,
+            (el) => el.style["background-image"]
+          );
+          if (
+            typeof backgroundImageValue === "string" &&
+            backgroundImageValue.substring(0, "url(".length) === "url(" &&
+            backgroundImageValue.charAt(backgroundImageValue.length - 1) === ")"
+          ) {
+            const urlValue = backgroundImageValue.substring(
+              "url(".length,
+              backgroundImageValue.length - 1
+            );
+            const urlValueWithoutQuotes =
+              urlValue.charAt(0) === '"' || urlValue.charAt(0) === "'"
+                ? urlValue.substring(1, urlValue.length - 1)
+                : urlValue;
+            const url = new URL(urlValueWithoutQuotes);
+            imageUrl = url.href;
+          }
+        }
+      } catch (e) {
+        // No image element found, or not in a URL format we understand.
+        // Skip the image.
+      }
+      const normalisedImgSrc = imageUrl
+        ? new URL(imageUrl, baseUrl).href
+        : undefined;
+
       return {
-        title: await getTitle(entryElement, config.titleSelector),
-        contents: await getContents(entryElement, config.contentSelector),
-        link: await getLink(entryElement, config.linkSelector, baseUrl),
-        retrieved: await getDate(
-          entryElement,
-          config.dateSelector,
-          config.dateFormat
-        ),
-        image: await getImage(entryElement, config.imageSelector, baseUrl),
+        title: (await titleElement?.textContent())?.trim() ?? undefined,
+        contents: (await contentElement.innerHTML()).trim(),
+        link: normalisedLink,
+        retrieved: dateValue ?? Date.now(),
+        image: normalisedImgSrc,
       };
     })
   );
@@ -350,6 +421,28 @@ function getGithubPagesUrl(): string | undefined {
 
   const [owner, repository] = repositorySlug.split("/");
   return `https://${owner}.github.io/${repository}/`;
+}
+
+/**
+ * Parses the datetime attribute of <time>, as long as it's a date
+ * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/time#valid_datetime_values
+ */
+function parseDatetime(datetime: string): Date | null {
+  const parts = datetime.split("-");
+  if (parts.length < 3) {
+    return null;
+  }
+  if (parts[2].length > 2) {
+    // It's not just `DD-MM-YYYY`:
+    return parseIsoDate(datetime);
+  }
+  return new Date(
+    Date.UTC(
+      Number.parseInt(parts[0]),
+      Number.parseInt(parts[1]) - 1,
+      Number.parseInt(parts[2])
+    )
+  );
 }
 
 function debug(
