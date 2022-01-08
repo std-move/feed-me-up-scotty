@@ -4,7 +4,7 @@ import { writeFile, mkdir, readFile } from "fs/promises";
 import fetch from "node-fetch";
 import { URL } from "url";
 import { parse as parseToml } from "@ltd/j-toml";
-import { getContents, getDate, getImage, getLink, getTitle } from "./parse";
+import { getContents, getDate, getImage, getLink, getTitle } from "./parse.js";
 
 export async function run(configFilePath = "./feeds.toml"): Promise<void> {
   const feedConfigs = await loadFeedConfigs(configFilePath);
