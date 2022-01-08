@@ -71,6 +71,14 @@ it.skip("can generate a feed with dates extracted from the content", async () =>
   expect(dateFeed).toMatchSnapshot();
 });
 
+it("can generate a feed where every the title and contents are spread out over multiple elements", async () => {
+  const multipleElementsFeed = await readFile(
+    resolve(__dirname, "../public/join-elements.xml"),
+    "utf-8"
+  );
+  expect(multipleElementsFeed).toMatchSnapshot();
+});
+
 it("correctly resolves relative links", async () => {
   const relativeLinksFeed = await readFile(
     resolve(__dirname, "../public/relative-link.xml"),
