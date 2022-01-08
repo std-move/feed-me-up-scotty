@@ -213,3 +213,6 @@ You can set an environment variable when running the command, e.g.:
 ```bash
 DEBUG="info" npx feed-me-up-scotty
 ```
+
+Additionally, if you want a dump of what the fetched HTML looks like, you can use
+`:root` as the `entrySelector`.
