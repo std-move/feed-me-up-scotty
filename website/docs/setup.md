@@ -79,7 +79,7 @@ matching the element inside individual feed entries containing that entry's
 title. For example, `"h2"` or `["h2", ".price"]`.
 
 If provided with an array of CSS Selectors, the contents of the matching elements
-will be joined together by spaces (` `). (Since version **1.8.0**.)
+will be joined together by spaces (` `). (Since version **1.9.0**.)
 
 ## `linkSelector`
 
@@ -105,7 +105,7 @@ content. For example, `"p.lead"`, or `[".image", ".caption"]`. If not provided,
 the entry as a whole will be used as the content.
 
 If provided with an array of CSS Selectors, the contents of the matching elements
-will be joined together by spaces (` `). (Since version **1.8.0**.)
+will be joined together by spaces (` `). (Since version **1.9.0**.)
 
 Available since version: **1.2.0**.
 
