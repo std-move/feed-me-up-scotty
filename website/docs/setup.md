@@ -199,3 +199,17 @@ Optional, [string](https://toml.io/en/v1.0.0#string).
 Can be used to provide a selector that indicates when the page is fully loaded.
 If set, _Feed me up, Scotty!_ will start looking for the feed content only when
 a matching element is added to the page.
+
+# Debugging
+
+If your configuration is not producing the entries you expect, you can configure
+_Feed me up, Scotty!_ to log more information to help you debugging it. To do so,
+set the environment variable `$DEBUG` to `"info"`, `"warning"` or `"error"`
+(default), where `"info"` logs most information, and `"error"` only logs
+critical errors.
+
+You can set an environment variable when running the command, e.g.:
+
+```bash
+DEBUG="info" npx feed-me-up-scotty
+```
