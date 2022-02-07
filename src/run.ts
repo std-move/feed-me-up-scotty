@@ -75,7 +75,7 @@ export type FeedConfig = {
 };
 
 async function loadFeedConfigs(configFilePath: string): Promise<FeedConfig[]> {
-  const configFile = await readFile(configFilePath, "utf-8");
+  const configFile = await readFile(configFilePath);
   const parsed = parseToml(configFile, 1.0, "\n", false);
   const defaultSettingsId = "default";
 
