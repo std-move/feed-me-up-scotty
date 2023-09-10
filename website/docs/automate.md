@@ -30,7 +30,7 @@ resulting feed using GitLab Pages.
 1. Fork [this repository](https://gitlab.com/vincenttunru/feeds).
 2. In your fork, edit `feeds.toml` to provide your desired data sources.
 3. [Create a new pipeline schedule](https://docs.gitlab.com/ee/ci/pipelines/schedules.html#configuring-pipeline-schedules)
-   (_CI/CD → Schedules_).
+   (_Build → Pipeline schedules_).
 4. Set it to your desired interval (e.g. `30 5,17 * * *` to run at 5:30 and 17:30).
 5. Hit "Save pipeline schedule".
 
