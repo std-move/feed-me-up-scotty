@@ -16,7 +16,8 @@ export async function getTitle(
       )
     ).join(" ");
   }
-  const titleElement = await entryElement.$(titleSelector);
+  const titleElement =
+    titleSelector === "*" ? entryElement : await entryElement.$(titleSelector);
   return (await titleElement?.textContent())?.trim() ?? undefined;
 }
 
