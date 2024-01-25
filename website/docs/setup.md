@@ -81,7 +81,7 @@ title. For example, `"h2"` or `["h2", ".price"]`.
 If provided with an array of CSS Selectors, the contents of the matching elements
 will be joined together by spaces (` `). (Since version **1.9.0**.)
 
-Set it to `*` if the full entry should be used as the title.(Since version
+Set it to `*` if the full entry should be used as the title. (Since version
 **1.10.0**.)
 
 ## `linkSelector`
