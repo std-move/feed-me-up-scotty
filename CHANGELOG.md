@@ -6,14 +6,19 @@ The following changes have been implemented but not released yet:
 
 ## [Unreleased]
 
+### New features
+
+- `linkSelector` is now optional; if not provided, entries will link to the
+  the source page.
+
+The following sections document changes that have been released already:
+
 ## [1.10.0] - 2024-01-25
 
 ### New features
 
 - `titleSelector` now also supports `*` as a selector, which will use the full
   entry's text contents as the title.
-
-The following sections document changes that have been released already:
 
 ## [1.9.0] - 2022-01-08
 

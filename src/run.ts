@@ -57,7 +57,7 @@ export type FeedConfig = {
   title?: string;
   entrySelector: string;
   titleSelector: string | string[];
-  linkSelector: string;
+  linkSelector?: string;
   contentSelector?: string | string[];
   dateSelector?: string;
   dateFormat?: string;
@@ -208,7 +208,9 @@ async function fetchPageEntries(
       return {
         title: await getTitle(entryElement, config.titleSelector),
         contents: await getContents(entryElement, config.contentSelector),
-        link: await getLink(entryElement, config.linkSelector, baseUrl),
+        link: config.linkSelector
+          ? await getLink(entryElement, config.linkSelector, baseUrl)
+          : url,
         retrieved: await getDate(
           entryElement,
           config.dateSelector,

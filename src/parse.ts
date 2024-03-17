@@ -23,7 +23,7 @@ export async function getTitle(
 
 export async function getLink(
   entryElement: ElementHandleForTag<string>,
-  linkSelector: FeedConfig["linkSelector"],
+  linkSelector: Required<FeedConfig>["linkSelector"],
   baseUrl: string
 ): Promise<FeedData["elements"][0]["link"]> {
   const linkElement =
