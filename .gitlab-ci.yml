@@ -11,7 +11,7 @@ build:
     - npm run build
 
 build_website:
-  image: node:14
+  image: node:20
   stage: build
   script:
     - cd website
