@@ -1,8 +1,8 @@
-const lightCodeTheme = require("prism-react-renderer/themes/github");
-const darkCodeTheme = require("prism-react-renderer/themes/dracula");
+import type { Config } from '@docusaurus/types';
+import type * as Preset from '@docusaurus/preset-classic';
+import { themes as prismThemes } from "prism-react-renderer";
 
-/** @type {import('@docusaurus/types').DocusaurusConfig} */
-module.exports = {
+const config: Config = {
   title: "Feed me up, Scotty!",
   tagline: "RSS feeds for arbitrary websites, using CSS selectors",
   url: "https://feed-me-up-scotty.vincenttunru.com",
@@ -77,11 +77,11 @@ module.exports = {
       copyright: `Copyright © ${new Date().getFullYear()} Vincent Tunru.`,
     },
     prism: {
-      theme: lightCodeTheme,
-      darkTheme: darkCodeTheme,
+      theme: prismThemes.github,
+      darkTheme: prismThemes.dracula,
       additionalLanguages: ["toml"],
     },
-  },
+  } satisfies Preset.ThemeConfig,
   presets: [
     [
       "@docusaurus/preset-classic",
@@ -95,7 +95,9 @@ module.exports = {
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
         },
-      },
+      } satisfies Preset.Options,
     ],
   ],
 };
+
+export default config;
