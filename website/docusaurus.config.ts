@@ -14,6 +14,9 @@ const config: Config = {
   // projectName: "docusaurus", // Usually your repo name.
   themeConfig: {
     image: "img/card.png",
+    colorMode: {
+      respectPrefersColorScheme: true,
+    },
     navbar: {
       title: "Feed me up, Scotty!",
       logo: {
