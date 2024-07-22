@@ -10,5 +10,6 @@ module.exports = {
     sourceType: "module",
   },
   plugins: ["@typescript-eslint"],
+  ignorePatterns: ["website/docusaurus.config.ts"],
   rules: {},
 };

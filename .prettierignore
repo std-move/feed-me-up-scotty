@@ -1,0 +1,3 @@
+# To avoid having to update Prettier as well,
+# ignore this file, which uses a newer TS feature (`satisfies`):
+website/docusaurus.config.ts
