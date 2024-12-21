@@ -29,6 +29,12 @@ linkSelector = "h2 a"
 Run `npx feed-me-up-scotty` (requires Node.js to be installed) to generate
 the configured feeds in a new folder called `public/`.
 
+:::tip
+
+If the options below do not produce the results you expect, see [Debugging](#debugging) for pointers on how to diagnose.
+
+:::
+
 # Fields
 
 [Table headers](https://toml.io/en/v1.0.0#table) serve as the feed identifier;
@@ -44,13 +50,13 @@ every feed configuration that does not specify a value for that option itself.
 For example, the configuration above would time out if the two source pages do
 not load within 30 seconds.
 
-## `title`
+### `title`
 
 Optional, [string](https://toml.io/en/v1.0.0#string).
 
 A title for your feed.
 
-## `url`
+### `url`
 
 Required, [string](https://toml.io/en/v1.0.0#string).
 
@@ -59,7 +65,7 @@ URL of which to generate an RSS feed.
 You can also pass an array of strings, e.g. to concatenate contents of multiple
 pages into a single RSS feed.
 
-## `entrySelector`
+### `entrySelector`
 
 Required, [string](https://toml.io/en/v1.0.0#string).
 
@@ -68,7 +74,7 @@ Selector](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Sel
 matching the elements that contain individual feed entries. For example,
 `"article"`.
 
-## `titleSelector`
+### `titleSelector`
 
 Required, [string](https://toml.io/en/v1.0.0#string) or [array](https://toml.io/en/v1.0.0#array) of
 [strings](https://toml.io/en/v1.0.0#string).
@@ -84,7 +90,7 @@ will be joined together by spaces (` `). (Since version **1.9.0**.)
 Set it to `*` if the full entry should be used as the title. (Since version
 **1.10.0**.)
 
-## `linkSelector`
+### `linkSelector`
 
 Required, [string](https://toml.io/en/v1.0.0#string).
 
@@ -96,7 +102,7 @@ to view that entry in your browser. For example, `"a.permalink"`.
 Set it to `*` if the link is to be found on the element matched by
 `entrySelector`.
 
-## `contentSelector`
+### `contentSelector`
 
 Optional, [string](https://toml.io/en/v1.0.0#string) or [array](https://toml.io/en/v1.0.0#array) of
 [strings](https://toml.io/en/v1.0.0#string).
@@ -112,7 +118,7 @@ will be joined together by spaces (` `). (Since version **1.9.0**.)
 
 Available since version: **1.2.0**.
 
-## `dateSelector`
+### `dateSelector`
 
 Optional, [string](https://toml.io/en/v1.0.0#string).
 
@@ -124,7 +130,7 @@ generated will be used as the publication time.
 
 Available since version: **1.5.0**.
 
-## `dateFormat`
+### `dateFormat`
 
 Optional, [string](https://toml.io/en/v1.0.0#string).
 
@@ -134,13 +140,13 @@ that describes the format of the date in the element matched by `dateSelector`.
 
 Available since version: **1.5.0**.
 
-## `timeout`
+### `timeout`
 
 Optional, [integer](https://toml.io/en/v1.0.0#integer).
 
 Number of seconds to wait for the given page to load. Defaults to 60.
 
-## `filters`
+### `filters`
 
 Optional, [array](https://toml.io/en/v1.0.0#array) of
 [strings](https://toml.io/en/v1.0.0#string).
@@ -148,7 +154,7 @@ Optional, [array](https://toml.io/en/v1.0.0#array) of
 If set, entries containing one or more of the given strings will not be
 included. For example, `["Next page"]`.
 
-## `matchOneOf`
+### `matchOneOf`
 
 Optional, [array](https://toml.io/en/v1.0.0#array) of
 [strings](https://toml.io/en/v1.0.0#string).
@@ -158,7 +164,7 @@ included. For example, `["New", "Available"]`.
 
 Available since version: **1.6.0.**.
 
-## `matchAllOf`
+### `matchAllOf`
 
 Optional, [array](https://toml.io/en/v1.0.0#array) of
 [strings](https://toml.io/en/v1.0.0#string).
@@ -173,7 +179,7 @@ Available since version: **1.6.0.**.
 The following fields are experimental and may be removed or changed in a future
 version. They can help dealing with unstable feed sources.
 
-## `onFail`
+### `onFail`
 
 Optional, one of `"error"` (default), `"stale"`, or `"exclude"`.
 
@@ -184,7 +190,7 @@ What to do when fetching a feed source failed. Possible values:
   available.
 - `"skip"`: don't update this feed, and don't preserve previously fetched feeds.
 
-## `waitUntil`
+### `waitUntil`
 
 Optional, one of `"domcontentloaded"` (default), `"load"`, or `"networkidle"`
 
@@ -195,7 +201,7 @@ you want to see in your feed.
 See https://playwright.dev/docs/api/class-page#page-goto-option-wait-until for
 documentation on the different options.
 
-## `waitForSelector`
+### `waitForSelector`
 
 Optional, [string](https://toml.io/en/v1.0.0#string).
 
@@ -203,7 +209,7 @@ Can be used to provide a selector that indicates when the page is fully loaded.
 If set, _Feed me up, Scotty!_ will start looking for the feed content only when
 a matching element is added to the page.
 
-# Debugging
+## Debugging
 
 If your configuration is not producing the entries you expect, you can configure
 _Feed me up, Scotty!_ to log more information to help you debugging it. To do so,
