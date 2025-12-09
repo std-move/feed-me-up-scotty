@@ -1,6 +1,8 @@
 # FORK NOTICE
 this is just a "fork" of https://gitlab.com/vincenttunru/feed-me-up-scotty/
+
 I have forked the repo to make customizations for my usage patterns.
+
 This repo is therefore not what you want to use.
 
 # Feed me up, Scotty!
