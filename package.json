@@ -8,7 +8,7 @@
     "build": "tsc",
     "test": "eslint src/ && jest",
     "start": "node --loader ts-node/esm --unhandled-rejections=strict src/index.ts",
-    "prepare": "husky install"
+    "prepare": "npm run build"
   },
   "type": "module",
   "author": "",
