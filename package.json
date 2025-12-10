@@ -2,8 +2,8 @@
   "name": "feed-me-up-scotty",
   "version": "1.10.0",
   "description": "RSS feeds for arbitrary websites, using CSS selectors",
-  "main": "./bin.mjs",
-  "bin": "dist/index.js",
+  "main": "./src/index.js",
+  "bin": "./bin.mjs",
   "scripts": {
     "build": "tsc",
     "test": "eslint src/ && jest",
