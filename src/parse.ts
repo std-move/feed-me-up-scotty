@@ -69,7 +69,7 @@ export async function getContents(
           getContents(entryElement, singleSelector)
         )
       )
-    ).(" — ");
+    ).join(" — ");
   }
   const contentElement =
     typeof contentSelector === "string"
