@@ -14,7 +14,7 @@ export async function getTitle(
           getTitle(entryElement, singleSelector)
         )
       )
-    ).join(" ");
+    ).join(" — ");
   }
   const titleElement =
     titleSelector === "*" ? entryElement : await entryElement.$(titleSelector);
@@ -43,10 +43,10 @@ export async function getContents(
     return (
       await Promise.all(
         contentSelector.map((singleSelector) =>
-          getTitle(entryElement, singleSelector)
+          getContents(entryElement, singleSelector)
         )
       )
-    ).join(" ");
+    ).(" — ");
   }
   const contentElement =
     typeof contentSelector === "string"
