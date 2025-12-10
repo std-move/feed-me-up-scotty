@@ -2,7 +2,7 @@
   "name": "feed-me-up-scotty",
   "version": "1.10.0",
   "description": "RSS feeds for arbitrary websites, using CSS selectors",
-  "main": "src/index.ts",
+  "main": "./bin.mjs",
   "bin": "dist/index.js",
   "scripts": {
     "build": "tsc",
@@ -18,7 +18,8 @@
     "date-fns": "^2.23.0",
     "feed": "^4.2.2",
     "node-fetch": "^2.6.1",
-    "playwright-firefox": "^1.16.3"
+    "playwright-firefox": "^1.16.3",
+    "tsx": "^4.x"
   },
   "devDependencies": {
     "@tsconfig/node12": "^1.0.9",
