@@ -21,6 +21,29 @@ export async function getTitle(
   return (await titleElement?.textContent())?.trim() ?? undefined;
 }
 
+
+function safeParseUrl(linkValue, baseUrl) {
+  try {
+    return new URL(linkValue, baseUrl);
+  } catch (error) {
+    console.log("Failed to convert link: " + linkValue);
+    console.log(error);
+    // If URL construction fails, try splitting by space and use longest string
+    const parts = linkValue.split(' ');
+    const longestPart = parts.reduce((longest, current) => 
+      current.length > longest.length ? current : longest
+    , '');
+    
+    try {
+      return new URL(longestPart, baseUrl);
+    } catch (fallbackError) {
+      console.log("Failed to convert link: " + longestPart);
+      console.log(fallbackError);
+      return undefined;
+    }
+  }
+}
+
 export async function getLink(
   entryElement: ElementHandleForTag<string>,
   linkSelector: Required<FeedConfig>["linkSelector"],
