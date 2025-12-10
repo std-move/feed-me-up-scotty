@@ -3,7 +3,7 @@
   "version": "1.10.0",
   "description": "RSS feeds for arbitrary websites, using CSS selectors",
   "main": "./src/index.js",
-  "bin": "./bin.mjs",
+  "bin": "./dist/index.js",
   "scripts": {
     "build": "tsc",
     "test": "eslint src/ && jest",
