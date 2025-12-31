@@ -14,11 +14,37 @@ export async function getTitle(
           getTitle(entryElement, singleSelector)
         )
       )
-    ).join(" ");
+    ).join(" — ");
   }
   const titleElement =
     titleSelector === "*" ? entryElement : await entryElement.$(titleSelector);
   return (await titleElement?.textContent())?.trim() ?? undefined;
+}
+
+function parseUrl(linkValue: string, baseUrl: string | URL): URL | null {
+  try {
+    return new URL(linkValue, baseUrl);
+  } catch (error) {
+    // If URL construction fails, try splitting by space and use longest string
+    const parts = linkValue.split(/\s+/);
+    const longestPart = parts.reduce(
+      (longest, current) =>
+        current.length > longest.length ? current : longest,
+      ""
+    );
+
+    console.log(
+      `Parsing link ${linkValue} failed (${error}) - longest part selected:`,
+      longestPart
+    );
+
+    try {
+      return new URL(longestPart, baseUrl);
+    } catch (fallbackError) {
+      console.log("Longest part parsing failed as well");
+      return null; // Return null if all attempts fail
+    }
+  }
 }
 
 export async function getLink(
@@ -30,7 +56,7 @@ export async function getLink(
     linkSelector === "*" ? entryElement : await entryElement.$(linkSelector);
   const linkValue = await linkElement?.getAttribute("href");
   const normalisedLink = linkValue
-    ? new URL(linkValue, baseUrl).href
+    ? parseUrl(linkValue, baseUrl)?.href
     : undefined;
   return normalisedLink;
 }
@@ -43,10 +69,10 @@ export async function getContents(
     return (
       await Promise.all(
         contentSelector.map((singleSelector) =>
-          getTitle(entryElement, singleSelector)
+          getContents(entryElement, singleSelector)
         )
       )
-    ).join(" ");
+    ).join(" — ");
   }
   const contentElement =
     typeof contentSelector === "string"

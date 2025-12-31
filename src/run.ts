@@ -5,15 +5,35 @@ import fetch from "node-fetch";
 import { URL } from "url";
 import { parse as parseToml } from "@ltd/j-toml";
 import { getContents, getDate, getImage, getLink, getTitle } from "./parse.js";
+import { createHash } from "crypto";
+
+const DEFAULT_TIMEOUT_SEC = 15;
 
 export async function run(configFilePath = "./feeds.toml"): Promise<void> {
   const feedConfigs = await loadFeedConfigs(configFilePath);
+
+  let savedError: Error | undefined;
+
   const feedsData: FeedData[] = await feedConfigs.reduce(
     async (feedsDataPromise, feedConfig) => {
       const feedsData = await feedsDataPromise;
-      const nextFeedData = await fetchFeedData(feedConfig);
-      if (isNotNull(nextFeedData)) {
-        feedsData.push(nextFeedData);
+      try {
+        const nextFeedData = await fetchFeedData(feedConfig);
+        if (isNotNull(nextFeedData)) {
+          feedsData.push(nextFeedData);
+        } else {
+          console.log("Feed data is NULL!: ", feedConfig.id, feedConfig.url);
+        }
+      } catch (error) {
+        console.log(
+          `Failed to fetch feed data (${error}): `,
+          feedConfig.id,
+          feedConfig.url
+        );
+        if (!savedError) {
+          savedError =
+            error instanceof Error ? error : new Error(String(error));
+        }
       }
       return feedsData;
     },
@@ -23,9 +43,13 @@ export async function run(configFilePath = "./feeds.toml"): Promise<void> {
     generateFeed(feedConfigs[i].id, feedData)
   );
 
-  const combinedFeedData = combineFeedData(feedsData);
-  await generateFeed("all", combinedFeedData);
-  await Promise.all(individualFeedPromises);
+  if (savedError) {
+    throw savedError;
+  }
+
+  // const combinedFeedData = combineFeedData(feedsData);
+  // await generateFeed("all", combinedFeedData);
+  // await Promise.all(individualFeedPromises);
 
   console.log("Feeds generated in `public/`.");
   if (typeof getRootUrl() === "string") {
@@ -33,7 +57,7 @@ export async function run(configFilePath = "./feeds.toml"): Promise<void> {
     feedConfigs.forEach((feedConfig) => {
       console.log(`- ${getRootUrl()}${feedConfig.id}.xml`);
     });
-    console.log(`\nA combined feed is available at:\n\t${getRootUrl()}all.xml`);
+    // console.log(`\nA combined feed is available at:\n\t${getRootUrl()}all.xml`);
   }
 }
 
@@ -115,11 +139,13 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData | null> {
     const context = await browser.newContext();
     const page = await context.newPage();
     await page.goto(firstUrl, {
-      timeout: (config.timeout ?? 60) * 1000,
+      timeout: (config.timeout ?? DEFAULT_TIMEOUT_SEC) * 1000,
       waitUntil: config.waitUntil ?? "domcontentloaded",
     });
     if (typeof config.waitForSelector === "string") {
-      await page.waitForSelector(config.waitForSelector);
+      await page.waitForSelector(config.waitForSelector, {
+        timeout: (config.timeout ?? DEFAULT_TIMEOUT_SEC) * 1000,
+      });
     }
     const faviconElement = await page.$("link[rel='icon']");
     const faviconPath = faviconElement
@@ -134,6 +160,10 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData | null> {
     }, Promise.resolve([] as FeedData["elements"]));
 
     debug(`Fetched ${config.id} (${entries.length} entries).`, "info");
+
+    if (entries.length < 1) {
+      throw new Error(`No entries fetched for feed: ${config.id}`);
+    }
 
     const filters = config.filters;
     const filteredEntries = Array.isArray(filters)
@@ -196,12 +226,17 @@ async function fetchPageEntries(
 ): Promise<FeedData["elements"]> {
   debug(`Fetching ${url} for ${config.id}`, "info");
   await page.goto(url, {
-    timeout: (config.timeout ?? 60) * 1000,
+    timeout: (config.timeout ?? DEFAULT_TIMEOUT_SEC) * 1000,
     waitUntil: config.waitUntil ?? "domcontentloaded",
   });
   if (typeof config.waitForSelector === "string") {
-    await page.waitForSelector(config.waitForSelector);
+    await page.waitForSelector(config.waitForSelector, {
+      timeout: (config.timeout ?? DEFAULT_TIMEOUT_SEC) * 1000,
+    });
   }
+  const html = await page.content();
+  console.log("Page contents: ", html);
+
   const entriesElements = await page.$$(config.entrySelector);
   const entries: FeedData["elements"] = await Promise.all(
     entriesElements.map(async (entryElement) => {
@@ -242,6 +277,25 @@ function combineFeedData(feedsData: FeedData[]): FeedData {
   };
 }
 
+function addLinkExtractionFailed(uri: string): string {
+  const hasQuery = uri.includes("?");
+  const separator = hasQuery ? "&" : "?";
+  return `${uri}${separator}link_extraction_failed=true`;
+}
+
+function generateId(link?: string, title?: string): string | undefined {
+  const source = link ?? title;
+
+  if (!source) {
+    return undefined;
+  }
+
+  return (
+    (link ? "link-" : "title") +
+    createHash("sha256").update(source).digest("hex").substring(0, 32)
+  ); // Truncate to 32 chars for UUID-like length
+}
+
 function toFeed(feedData: FeedData): string {
   const feed = new Feed({
     title: feedData.title,
@@ -251,13 +305,26 @@ function toFeed(feedData: FeedData): string {
     updated: new Date(Date.now()),
   });
   feedData.elements.forEach((element, i) => {
-    feed.addItem({
-      title: element.title ?? i.toString(),
-      link: element.link ?? feedData.url,
-      content: element.contents,
-      date: new Date(element.retrieved),
-      image: element.image,
-    });
+    const item_id = generateId(element.link, element.title);
+    if (!item_id) {
+      console.log("Failed to generate ID for item:", element.contents);
+      feed.addItem({
+        title: element.title ?? i.toString(),
+        link: element.link ?? addLinkExtractionFailed(feedData.url),
+        content: element.contents,
+        date: new Date(element.retrieved),
+        image: element.image,
+      });
+    } else {
+      feed.addItem({
+        title: element.title ?? i.toString(),
+        link: element.link ?? addLinkExtractionFailed(feedData.url),
+        id: item_id,
+        content: element.contents,
+        date: new Date(element.retrieved),
+        image: element.image,
+      });
+    }
   });
 
   if (feedData.elements.some((element) => typeof element.image === "string")) {
