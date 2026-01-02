@@ -23,6 +23,13 @@ export async function run(configFilePath = "./feeds.toml"): Promise<void> {
           feedsData.push(nextFeedData);
         } else {
           console.log("Feed data is NULL!: ", feedConfig.id, feedConfig.url);
+
+          const firstUrl = Array.isArray(feedConfig.url) ? feedConfig.url[0] : feedConfig.url;
+          feedsData.push({
+            title: feedConfig.title ?? feedConfig.id,
+            url: firstUrl,
+            elements: [],
+          });
         }
       } catch (error) {
         console.log(
@@ -34,6 +41,12 @@ export async function run(configFilePath = "./feeds.toml"): Promise<void> {
           savedError =
             error instanceof Error ? error : new Error(String(error));
         }
+        const firstUrl = Array.isArray(feedConfig.url) ? feedConfig.url[0] : feedConfig.url;
+          feedsData.push({
+            title: feedConfig.title ?? feedConfig.id,
+            url: firstUrl,
+            elements: [],
+          });
       }
       return feedsData;
     },
