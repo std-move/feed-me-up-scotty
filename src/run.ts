@@ -292,17 +292,17 @@ function addLinkExtractionFailed(uri: string): string {
   return `${uri}${separator}link_extraction_failed=true`;
 }
 
-function generateId(link?: string, title?: string): string | undefined {
+function generateId(link?: string, title?: string): string {
   const source = link ?? title;
 
   if (!source) {
-    return undefined;
+    throw new Error('At least one value must be non-null');
   }
 
   return (
-    (link ? "link-" : "title-") +
-    createHash("sha256").update(source).digest("hex").substring(0, 32)
-  ); // Truncate to 32 chars for UUID-like length
+    (link ? "link-" : "title-")
+    + createHash("sha256").update(source).digest("hex").substring(0, 32)
+  );
 }
 
 function toFeed(feedData: FeedData): string {
