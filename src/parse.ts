@@ -3,6 +3,8 @@ import { ElementHandleForTag } from "playwright-core/types/structs";
 import { URL } from "url";
 import type { FeedConfig, FeedData } from "./run";
 
+const DATE_NOW = Date.now();
+
 export async function getTitle(
   entryElement: ElementHandleForTag<string>,
   titleSelector: FeedConfig["titleSelector"]
@@ -119,14 +121,14 @@ export async function getDate(
     dateValue = parseDate(
       dateElementContent.trim(),
       dateFormat,
-      new Date(Date.now())
+      new Date(DATE_NOW)
     ).getTime();
   }
   if (Number.isNaN(dateValue)) {
     dateValue = undefined;
   }
 
-  return dateValue ?? Date.now();
+  return dateValue ?? DATE_NOW;
 }
 
 export async function getImage(
