@@ -70,7 +70,7 @@ async function generateFeed(feedId: string, feedData: FeedData) {
   await writeFile(`public/${feedId}.xml`, feed, "utf-8");
   await writeFile(
     `public/${feedId}.json`,
-    JSON.stringify(feedDataWithDates),
+    JSON.stringify(feedDataWithDates, null, '\t'),
     "utf-8"
   );
 }
