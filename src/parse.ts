@@ -10,13 +10,14 @@ export async function getTitle(
   titleSelector: FeedConfig["titleSelector"]
 ): Promise<FeedData["elements"][0]["title"]> {
   if (Array.isArray(titleSelector)) {
-    return (
+    const titles = (
       await Promise.all(
         titleSelector.map((singleSelector) =>
           getTitle(entryElement, singleSelector)
         )
       )
-    ).join(" — ");
+    ).filter(title => title);
+    return titles.length === 0 ? undefined : titles;
   }
   const titleElement =
     titleSelector === "*" ? entryElement : await entryElement.$(titleSelector);
