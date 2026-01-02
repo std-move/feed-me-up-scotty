@@ -291,7 +291,7 @@ function generateId(link?: string, title?: string): string | undefined {
   }
 
   return (
-    (link ? "link-" : "title") +
+    (link ? "link-" : "title-") +
     createHash("sha256").update(source).digest("hex").substring(0, 32)
   ); // Truncate to 32 chars for UUID-like length
 }
