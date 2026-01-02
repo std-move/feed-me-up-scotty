@@ -124,6 +124,7 @@ export type FeedData = {
   url: string;
   favicon?: string;
   elements: Array<{
+    id: string;
     title?: string;
     contents: string;
     link?: string;
@@ -240,12 +241,20 @@ async function fetchPageEntries(
   const entriesElements = await page.$$(config.entrySelector);
   const entries: FeedData["elements"] = await Promise.all(
     entriesElements.map(async (entryElement) => {
-      return {
-        title: await getTitle(entryElement, config.titleSelector),
-        contents: await getContents(entryElement, config.contentSelector),
-        link: config.linkSelector
+      const title = await getTitle(entryElement, config.titleSelector);
+      const link = config.linkSelector
           ? await getLink(entryElement, config.linkSelector, baseUrl)
-          : undefined,
+          : undefined;
+
+      if (!link && !title) {
+        throw new Error(`neither link or title can be extracted: ${config.id}`);
+      }
+
+      return {
+        id: generateId(link, title),
+        title: title,
+        link: link,
+        contents: await getContents(entryElement, config.contentSelector),
         retrieved: await getDate(
           entryElement,
           config.dateSelector,
@@ -305,26 +314,14 @@ function toFeed(feedData: FeedData): string {
     updated: new Date(Date.now()),
   });
   feedData.elements.forEach((element, i) => {
-    const item_id = generateId(element.link, element.title);
-    if (!item_id) {
-      console.log("Failed to generate ID for item:", element.contents);
-      feed.addItem({
-        title: element.title ?? i.toString(),
-        link: element.link ?? addLinkExtractionFailed(feedData.url),
-        content: element.contents,
-        date: new Date(element.retrieved),
-        image: element.image,
-      });
-    } else {
-      feed.addItem({
-        title: element.title ?? i.toString(),
-        link: element.link ?? addLinkExtractionFailed(feedData.url),
-        id: item_id,
-        content: element.contents,
-        date: new Date(element.retrieved),
-        image: element.image,
-      });
-    }
+    feed.addItem({
+      title: element.title ?? i.toString(),
+      link: element.link ?? addLinkExtractionFailed(feedData.url),
+      id: element.id,
+      content: element.contents,
+      date: new Date(element.retrieved),
+      image: element.image,
+    });
   });
 
   if (feedData.elements.some((element) => typeof element.image === "string")) {
@@ -350,7 +347,7 @@ async function reconcileDates(
   );
   const newElements = feedData.elements.map((element) => {
     const existingElement = existingFeedData.elements.find(
-      (el) => typeof el.link === "string" && el.link === element.link
+      (el) => el.id === element.id
     );
     if (!existingElement) {
       return element;
