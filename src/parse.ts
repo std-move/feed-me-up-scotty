@@ -32,16 +32,31 @@ function parseUrl(linkValue: string, baseUrl: string | URL): URL | null {
         current.length > longest.length ? current : longest,
       ""
     );
-
     console.log(
-      `Parsing link ${linkValue} failed (${error}) - longest part selected:`,
+      `Parsing link "${linkValue}" failed (${error}) - longest part selected:`,
       longestPart
     );
-
     try {
       return new URL(longestPart, baseUrl);
     } catch (fallbackError) {
       console.log("Longest part parsing failed as well");
+      
+      // Check if the string looks like it might be missing a scheme
+      // (e.g., starts with domain-like pattern: www., example.com, subdomain.example.com)
+      const looksLikeDomain = longestPart && 
+        !longestPart.includes(':') && // no scheme present
+        (/^www\./i.test(longestPart) || // starts with www.
+         /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+/i.test(longestPart)); // domain pattern
+      
+      if (looksLikeDomain) {
+        console.log("String looks like a domain without scheme, attempting to add http://");
+        try {
+          return new URL(`http://${longestPart}`);
+        } catch (httpError) {
+          console.log("Adding http:// scheme failed");
+        }
+      }
+      
       return null; // Return null if all attempts fail
     }
   }
