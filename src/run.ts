@@ -245,7 +245,7 @@ async function fetchPageEntries(
         contents: await getContents(entryElement, config.contentSelector),
         link: config.linkSelector
           ? await getLink(entryElement, config.linkSelector, baseUrl)
-          : url,
+          : undefined,
         retrieved: await getDate(
           entryElement,
           config.dateSelector,
