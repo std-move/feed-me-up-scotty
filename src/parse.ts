@@ -17,7 +17,7 @@ export async function getTitle(
         )
       )
     ).filter(title => title);
-    return titles.length === 0 ? undefined : titles;
+    return titles.length === 0 ? undefined : titles.join(" — ");
   }
   const titleElement =
     titleSelector === "*" ? entryElement : await entryElement.$(titleSelector);
