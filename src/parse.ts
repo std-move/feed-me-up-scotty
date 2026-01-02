@@ -18,7 +18,9 @@ export async function getTitle(
   }
   const titleElement =
     titleSelector === "*" ? entryElement : await entryElement.$(titleSelector);
-  return (await titleElement?.textContent())?.trim() ?? undefined;
+  
+  const trimmed = (await titleElement?.textContent())?.trim();
+  return trimmed && trimmed.length > 0 ? trimmed : undefined;
 }
 
 function parseUrl(linkValue: string, baseUrl: string | URL): URL | null {
