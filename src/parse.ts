@@ -111,7 +111,7 @@ export async function getContents(
       ? await entryElement.$(contentSelector)
       : entryElement;
 
-  if (!contentElement && typeof contentSelector === "string") {
+  if (!contentElement) {
     throw new Error(`No element found for content selector: "${contentSelector}"`);
   }
 
