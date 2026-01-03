@@ -111,11 +111,12 @@ export async function getDate(
     const xpathExpression = dateSelector.slice("xpathstr=".length);
 
     const dateString = await entryElement.evaluate((el, xpath) => {
-      const result = document.evaluate(
+      const doc = (el as any).ownerDocument;
+      const result = doc.evaluate(
         xpath,
         el,
         null,
-        XPathResult.STRING_TYPE,
+        (doc.defaultView as any).XPathResult.STRING_TYPE,
         null
       );
       return result.stringValue;
