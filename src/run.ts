@@ -6,6 +6,7 @@ import { URL } from "url";
 import { parse as parseToml } from "@ltd/j-toml";
 import { getContents, getDate, getImage, getLink, getTitle } from "./parse.js";
 import { createHash } from "crypto";
+import { performance } from 'perf_hooks';
 
 const DEFAULT_TIMEOUT_SEC = 15;
 
@@ -19,6 +20,7 @@ export async function run(configFilePath = "./feeds.toml"): Promise<void> {
   const feedsData: FeedData[] = await feedConfigs.reduce(
     async (feedsDataPromise, feedConfig) => {
       const feedsData = await feedsDataPromise;
+      const start = performance.now();
       try {
         const nextFeedData = await fetchFeedData(feedConfig);
         if (isNotNull(nextFeedData)) {
@@ -50,6 +52,8 @@ export async function run(configFilePath = "./feeds.toml"): Promise<void> {
             elements: [],
           });
       }
+      const end = performance.now();
+      debug(`Fetching feed ${feedConfig.id} took ${(end - start).toFixed(2)} ms`);
       return feedsData;
     },
     Promise.resolve([] as FeedData[])
