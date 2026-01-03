@@ -56,13 +56,10 @@ export async function run(configFilePath = "./feeds.toml"): Promise<void> {
     generateFeed(feedConfigs[i].id, feedData)
   );
 
-  if (savedError) {
-    throw savedError;
-  }
+  await Promise.all(individualFeedPromises);
 
   // const combinedFeedData = combineFeedData(feedsData);
   // await generateFeed("all", combinedFeedData);
-  // await Promise.all(individualFeedPromises);
 
   console.log("Feeds generated in `public/`.");
   if (typeof getRootUrl() === "string") {
@@ -71,6 +68,11 @@ export async function run(configFilePath = "./feeds.toml"): Promise<void> {
       console.log(`- ${getRootUrl()}${feedConfig.id}.xml`);
     });
     // console.log(`\nA combined feed is available at:\n\t${getRootUrl()}all.xml`);
+  }
+
+  if (savedError) {
+    console.log("Throwing error saved during processing");
+    throw savedError;
   }
 }
 
