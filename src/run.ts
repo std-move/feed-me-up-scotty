@@ -148,16 +148,48 @@ export type FeedData = {
   }>;
 };
 
+async function tolerantGoto(
+  page: Page,
+  url: string,
+  config: FeedConfig
+): Promise<void> {
+  const maxRetries = 3;
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      await page.goto(url, {
+        timeout: (config.timeout ?? DEFAULT_TIMEOUT_SEC) * 1000,
+        waitUntil: config.waitUntil ?? "domcontentloaded",
+      });
+      return; // Success - just return
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('NS_BINDING_ABORTED')) {
+        if (i < maxRetries - 1) {
+          // Retry on intermediate failures
+          console.warn(`NS_BINDING_ABORTED on attempt ${i + 1}/${maxRetries}, retrying...`);
+          await page.waitForTimeout(200 * Math.pow(2, i)); // 200ms, 400ms, 800ms
+          continue;
+        } else {
+          // Final attempt failed - log error but suppress it
+          console.error(
+            `NS_BINDING_ABORTED persists after ${maxRetries} attempts. ` +
+            `Suppressing error and continuing. URL: ${url}`
+          );
+          return; // Suppress the error on final attempt
+        }
+      }
+      // Immediately throw any non-NS_BINDING_ABORTED errors
+      throw error;
+    }
+  }
+}
+
 async function fetchFeedData(config: FeedConfig): Promise<FeedData | null> {
   const browser = await firefox.launch();
   try {
     const firstUrl = Array.isArray(config.url) ? config.url[0] : config.url;
     const context = await browser.newContext();
     const page = await context.newPage();
-    await page.goto(firstUrl, {
-      timeout: (config.timeout ?? DEFAULT_TIMEOUT_SEC) * 1000,
-      waitUntil: config.waitUntil ?? "domcontentloaded",
-    });
+    await tolerantGoto(page, firstUrl, config);
     if (typeof config.waitForSelector === "string") {
       await page.waitForSelector(config.waitForSelector, {
         timeout: (config.timeout ?? DEFAULT_TIMEOUT_SEC) * 1000,
@@ -244,10 +276,7 @@ async function fetchPageEntries(
 
   // already fetched otherwise...
   if (url !== baseUrl) {
-    await page.goto(url, {
-      timeout: (config.timeout ?? DEFAULT_TIMEOUT_SEC) * 1000,
-      waitUntil: config.waitUntil ?? "domcontentloaded",
-    });
+    await tolerantGoto(page, url, config);
     if (typeof config.waitForSelector === "string") {
       await page.waitForSelector(config.waitForSelector, {
         timeout: (config.timeout ?? DEFAULT_TIMEOUT_SEC) * 1000,
