@@ -12,6 +12,8 @@ const DEFAULT_TIMEOUT_SEC = 15;
 export async function run(configFilePath = "./feeds.toml"): Promise<void> {
   const feedConfigs = await loadFeedConfigs(configFilePath);
 
+  console.log("Starting with config:", JSON.stringify(feedConfigs, null, '\t'));
+
   let savedError: Error | undefined;
 
   const feedsData: FeedData[] = await feedConfigs.reduce(
