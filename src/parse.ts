@@ -106,6 +106,49 @@ export async function getDate(
   dateSelector: FeedConfig["dateSelector"],
   dateFormat: FeedConfig["dateFormat"]
 ): Promise<FeedData["elements"][0]["retrieved"]> {
+  // Check if using XPath string extraction
+  if (typeof dateSelector === "string" && dateSelector.startsWith("xpathstr=")) {
+    const xpathExpression = dateSelector.slice("xpathstr=".length);
+
+    const dateString = await entryElement.evaluate((el, xpath) => {
+      const result = document.evaluate(
+        xpath,
+        el,
+        null,
+        XPathResult.STRING_TYPE,
+        null
+      );
+      return result.stringValue;
+    }, xpathExpression);
+
+    let dateValue: number | undefined = undefined;
+
+    if (dateString && typeof dateFormat === "string") {
+      let parsedDate = parseDate(
+        dateString.trim(),
+        dateFormat,
+        new Date(DATE_NOW)
+      );
+
+      // Check if date is in the future and adjust
+      while (parsedDate.getTime() > DATE_NOW) {
+        console.warn(
+          `Date ${parsedDate.toISOString()} is in the future (${dateString.trim()}). Subtracting 1 year.`
+        );
+        parsedDate = new Date(parsedDate.setFullYear(parsedDate.getFullYear() - 1));
+      }
+
+      dateValue = parsedDate.getTime();
+    }
+
+    if (Number.isNaN(dateValue)) {
+      dateValue = undefined;
+    }
+
+    return dateValue ?? DATE_NOW;
+  }
+
+  // Original path: element-based extraction
   const dateElement =
     typeof dateSelector === "string"
       ? await entryElement.$(dateSelector)
@@ -113,18 +156,43 @@ export async function getDate(
   const datetimeAttribute = await dateElement?.getAttribute("datetime");
   const dateElementContent = await dateElement?.textContent();
   let dateValue: number | undefined = undefined;
+
   if (typeof datetimeAttribute === "string") {
-    dateValue = parseDatetime(datetimeAttribute)?.getTime();
+    const parsedDatetime = parseDatetime(datetimeAttribute);
+    if (parsedDatetime) {
+      let adjustedDate = parsedDatetime;
+
+      // Check if date is in the future and adjust
+      while (adjustedDate.getTime() > DATE_NOW) {
+        console.warn(
+          `Date ${adjustedDate.toISOString()} is in the future (datetime="${datetimeAttribute}"). Subtracting 1 year.`
+        );
+        adjustedDate = new Date(adjustedDate.setFullYear(adjustedDate.getFullYear() - 1));
+      }
+
+      dateValue = adjustedDate.getTime();
+    }
   } else if (
     typeof dateElementContent === "string" &&
     typeof dateFormat === "string"
   ) {
-    dateValue = parseDate(
+    let parsedDate = parseDate(
       dateElementContent.trim(),
       dateFormat,
       new Date(DATE_NOW)
-    ).getTime();
+    );
+
+    // Check if date is in the future and adjust
+    while (parsedDate.getTime() > DATE_NOW) {
+      console.warn(
+        `Date ${parsedDate.toISOString()} is in the future (content="${dateElementContent.trim()}"). Subtracting 1 year.`
+      );
+      parsedDate = new Date(parsedDate.setFullYear(parsedDate.getFullYear() - 1));
+    }
+
+    dateValue = parsedDate.getTime();
   }
+
   if (Number.isNaN(dateValue)) {
     dateValue = undefined;
   }
