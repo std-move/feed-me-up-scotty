@@ -155,6 +155,8 @@ async function tolerantGoto(
   url: string,
   config: FeedConfig
 ): Promise<void> {
+  debug(`Fetching ${url} for ${config.id}...`, "info");
+  
   const maxRetries = 3;
   for (let i = 0; i < maxRetries; i++) {
     try {
@@ -274,8 +276,6 @@ async function fetchPageEntries(
   baseUrl: string,
   config: FeedConfig
 ): Promise<FeedData["elements"]> {
-  debug(`Fetching ${url} for ${config.id}`, "info");
-
   // already fetched otherwise...
   if (url !== baseUrl) {
     await tolerantGoto(page, url, config);
