@@ -241,15 +241,20 @@ async function fetchPageEntries(
   config: FeedConfig
 ): Promise<FeedData["elements"]> {
   debug(`Fetching ${url} for ${config.id}`, "info");
-  await page.goto(url, {
-    timeout: (config.timeout ?? DEFAULT_TIMEOUT_SEC) * 1000,
-    waitUntil: config.waitUntil ?? "domcontentloaded",
-  });
-  if (typeof config.waitForSelector === "string") {
-    await page.waitForSelector(config.waitForSelector, {
+
+  // already fetched otherwise...
+  if (url !== baseUrl) {
+    await page.goto(url, {
       timeout: (config.timeout ?? DEFAULT_TIMEOUT_SEC) * 1000,
+      waitUntil: config.waitUntil ?? "domcontentloaded",
     });
+    if (typeof config.waitForSelector === "string") {
+      await page.waitForSelector(config.waitForSelector, {
+        timeout: (config.timeout ?? DEFAULT_TIMEOUT_SEC) * 1000,
+      });
+    }
   }
+
   const html = await page.content();
   console.log("Page contents: ", html);
 
