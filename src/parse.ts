@@ -19,6 +19,28 @@ export async function getTitle(
     ).filter(title => title);
     return titles.length === 0 ? undefined : titles.join(" — ");
   }
+
+  if (typeof titleSelector === "string" && titleSelector.startsWith("xpathstr=")) {
+    const xpathExpression = titleSelector.slice("xpathstr=".length);
+
+    const title = await entryElement.evaluate((el, xpath) => {
+      const doc = (el as any).ownerDocument;
+      const result = doc.evaluate(
+        xpath,
+        el,
+        null,
+        (doc.defaultView as any).XPathResult.STRING_TYPE,
+        null
+      );
+      return result.stringValue;
+    }, xpathExpression);
+
+    if (!title || title.trim() === "") {
+      throw new Error(`No result found for XPath title selector: "${xpathExpression}"`);
+    }
+    return title.trim();
+  }
+
   const titleElement =
     titleSelector === "*" ? entryElement : await entryElement.$(titleSelector);
 
