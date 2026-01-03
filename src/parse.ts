@@ -21,8 +21,15 @@ export async function getTitle(
   }
   const titleElement =
     titleSelector === "*" ? entryElement : await entryElement.$(titleSelector);
-  
+
+  if (!titleElement && titleSelector !== "*") {
+    throw new Error(`No element found for title selector: "${titleSelector}"`);
+  }
+
   const trimmed = (await titleElement?.textContent())?.trim();
+  if (titleSelector && titleSelector !== "*" && (!trimmed || trimmed.length === 0)) {
+    throw new Error(`Title selector "${titleSelector}" found element but it has no text content`);
+  }
   return trimmed && trimmed.length > 0 ? trimmed : undefined;
 }
 
@@ -45,14 +52,14 @@ function parseUrl(linkValue: string, baseUrl: string | URL): URL | null {
       return new URL(longestPart, baseUrl);
     } catch (fallbackError) {
       console.log("Longest part parsing failed as well");
-      
+
       // Check if the string looks like it might be missing a scheme
       // (e.g., starts with domain-like pattern: www., example.com, subdomain.example.com)
-      const looksLikeDomain = longestPart && 
+      const looksLikeDomain = longestPart &&
         !longestPart.includes(':') && // no scheme present
         (/^www\./i.test(longestPart) || // starts with www.
-         /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+/i.test(longestPart)); // domain pattern
-      
+          /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+/i.test(longestPart)); // domain pattern
+
       if (looksLikeDomain) {
         console.log("String looks like a domain without scheme, attempting to add http://");
         try {
@@ -61,7 +68,7 @@ function parseUrl(linkValue: string, baseUrl: string | URL): URL | null {
           console.log("Adding http:// scheme failed");
         }
       }
-      
+
       return null; // Return null if all attempts fail
     }
   }
@@ -74,6 +81,11 @@ export async function getLink(
 ): Promise<FeedData["elements"][0]["link"]> {
   const linkElement =
     linkSelector === "*" ? entryElement : await entryElement.$(linkSelector);
+
+  if (!linkElement && linkSelector !== "*") {
+    throw new Error(`No element found for link selector: "${linkSelector}"`);
+  }
+
   const linkValue = await linkElement?.getAttribute("href");
   const normalisedLink = linkValue
     ? parseUrl(linkValue, baseUrl)?.href
@@ -96,8 +108,13 @@ export async function getContents(
   }
   const contentElement =
     typeof contentSelector === "string"
-      ? (await entryElement.$(contentSelector)) ?? entryElement
+      ? await entryElement.$(contentSelector)
       : entryElement;
+
+  if (!contentElement && typeof contentSelector === "string") {
+    throw new Error(`No element found for content selector: "${contentSelector}"`);
+  }
+
   return (await contentElement.innerHTML()).trim();
 }
 
@@ -121,6 +138,10 @@ export async function getDate(
       );
       return result.stringValue;
     }, xpathExpression);
+
+    if (!dateString || dateString.trim() === "") {
+      throw new Error(`No result found for XPath date selector: "${xpathExpression}"`);
+    }
 
     let dateValue: number | undefined = undefined;
 
@@ -154,6 +175,11 @@ export async function getDate(
     typeof dateSelector === "string"
       ? await entryElement.$(dateSelector)
       : undefined;
+
+  if (!dateElement && typeof dateSelector === "string") {
+    throw new Error(`No element found for date selector: "${dateSelector}"`);
+  }
+
   const datetimeAttribute = await dateElement?.getAttribute("datetime");
   const dateElementContent = await dateElement?.textContent();
   let dateValue: number | undefined = undefined;
@@ -210,6 +236,11 @@ export async function getImage(
     typeof imageSelector === "string"
       ? await entryElement.$(imageSelector)
       : undefined;
+
+  if (!imageElement && typeof imageSelector === "string") {
+    throw new Error(`No element found for image selector: "${imageSelector}"`);
+  }
+
   let imageUrl = await imageElement?.getAttribute("src");
   try {
     if (imageSelector && typeof imageUrl !== "string") {
