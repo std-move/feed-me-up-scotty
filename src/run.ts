@@ -196,6 +196,8 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData | null> {
   try {
     const firstUrl = Array.isArray(config.url) ? config.url[0] : config.url;
     const context = await browser.newContext();
+    context.setDefaultTimeout(config.timeout ?? DEFAULT_TIMEOUT_SEC);
+    context.setDefaultNavigationTimeout(config.timeout ?? DEFAULT_TIMEOUT_SEC);
     const page = await context.newPage();
     await tolerantGoto(page, firstUrl, config);
     if (typeof config.waitForSelector === "string") {
