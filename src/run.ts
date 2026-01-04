@@ -199,12 +199,21 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData | null> {
     context.setDefaultTimeout(config.timeout ?? DEFAULT_TIMEOUT_SEC);
     context.setDefaultNavigationTimeout(config.timeout ?? DEFAULT_TIMEOUT_SEC);
     const page = await context.newPage();
-    await tolerantGoto(page, firstUrl, config);
-    if (typeof config.waitForSelector === "string") {
-      await page.waitForSelector(config.waitForSelector, {
-        timeout: (config.timeout ?? DEFAULT_TIMEOUT_SEC) * 1000,
-      });
+
+    try {
+      await tolerantGoto(page, firstUrl, config);
+      if (typeof config.waitForSelector === "string") {
+        await page.waitForSelector(config.waitForSelector, {
+          timeout: (config.timeout ?? DEFAULT_TIMEOUT_SEC) * 1000,
+        });
+      }
+    } finally {
+      const html = await page.content();
+      console.log("[BEGIN_PAGE_CONTENTS_DUMP]");
+      console.log(html);
+      console.log("[END_PAGE_CONTENTS_DUMP]");
     }
+
     const faviconElement = await page.$("link[rel='icon']");
     const faviconPath = faviconElement
       ? (await faviconElement.getAttribute("href")) ?? "favicon.ico"
@@ -284,16 +293,20 @@ async function fetchPageEntries(
 ): Promise<FeedData["elements"]> {
   // already fetched otherwise...
   if (url !== baseUrl) {
-    await tolerantGoto(page, url, config);
-    if (typeof config.waitForSelector === "string") {
-      await page.waitForSelector(config.waitForSelector, {
-        timeout: (config.timeout ?? DEFAULT_TIMEOUT_SEC) * 1000,
-      });
+    try {
+      await tolerantGoto(page, url, config);
+      if (typeof config.waitForSelector === "string") {
+        await page.waitForSelector(config.waitForSelector, {
+            timeout: (config.timeout ?? DEFAULT_TIMEOUT_SEC) * 1000,
+        });
+      }
+    } finally {
+      const html = await page.content();
+      console.log("[BEGIN_PAGE_CONTENTS_DUMP]");
+      console.log(html);
+      console.log("[END_PAGE_CONTENTS_DUMP]");
     }
   }
-
-  const html = await page.content();
-  console.log("Page contents: ", html);
 
   const entriesElements = await page.$$(config.entrySelector);
   const entries: FeedData["elements"] = await Promise.all(
