@@ -162,30 +162,57 @@ async function tolerantGoto(
   debug(`Fetching ${url} for ${config.id}...`, "info");
   
   const maxRetries = 3;
+  let currentWaitUntil = config.waitUntil ?? "domcontentloaded";
+  let hasTriedFallback = false;
+  
   for (let i = 0; i < maxRetries; i++) {
     try {
       await page.goto(url, {
         timeout: (config.timeout ?? DEFAULT_TIMEOUT_SEC) * 1000,
-        waitUntil: config.waitUntil ?? "domcontentloaded",
+        waitUntil: currentWaitUntil,
       });
+      // ugly but possibly will help sometimes and not slow us down that much
+      await page.waitForTimeout(80);
       return; // Success - just return
     } catch (error) {
-      if (error instanceof Error && error.message.includes('NS_BINDING_ABORTED')) {
-        if (i < maxRetries - 1) {
-          // Retry on intermediate failures
-          console.warn(`NS_BINDING_ABORTED on attempt ${i + 1}/${maxRetries}, retrying...`);
-          await page.waitForTimeout(200 * Math.pow(2, i)); // 200ms, 400ms, 800ms
-          continue;
-        } else {
-          // Final attempt failed - log error but suppress it
-          console.error(
-            `NS_BINDING_ABORTED persists after ${maxRetries} attempts. ` +
-            `Suppressing error and continuing. URL: ${url}`
+      if (error instanceof Error) {
+        // Handle timeout errors with 'load' or 'networkidle' waitUntil
+        const isTimeout = /timeout|timed out/i.test(error.message) || 
+                         error.name === 'TimeoutError';
+        if (isTimeout && 
+            (currentWaitUntil === 'load' || currentWaitUntil === 'networkidle') && 
+            !hasTriedFallback) {
+          console.warn(
+            `Timeout with waitUntil='${currentWaitUntil}' on attempt ${i + 1}/${maxRetries}. ` +
+            `Falling back to 'domcontentloaded'...`
           );
-          return; // Suppress the error on final attempt
+          currentWaitUntil = 'domcontentloaded';
+          hasTriedFallback = true;
+          await page.waitForTimeout(200);
+          continue;
+        }
+        
+        // Handle NS_BINDING_ABORTED errors
+        if (error.message.includes('NS_BINDING_ABORTED')) {
+          if (i < maxRetries - 1) {
+            // Retry on intermediate failures
+            console.warn(
+              `NS_BINDING_ABORTED on attempt ${i + 1}/${maxRetries}, retrying...`
+            );
+            await page.waitForTimeout(200 * Math.pow(2, i)); // 200ms, 400ms, 800ms
+            continue;
+          } else {
+            // Final attempt failed - log error but suppress it
+            console.error(
+              `NS_BINDING_ABORTED persists after ${maxRetries} attempts. ` +
+              `Suppressing error and continuing. URL: ${url}`
+            );
+            return; // Suppress the error on final attempt
+          }
         }
       }
-      // Immediately throw any non-NS_BINDING_ABORTED errors
+      
+      // Immediately throw any other errors
       throw error;
     }
   }
