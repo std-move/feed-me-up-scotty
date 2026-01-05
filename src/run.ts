@@ -21,13 +21,31 @@ export async function run(configFilePath = "./feeds.toml"): Promise<void> {
     async (feedsDataPromise, feedConfig) => {
       const feedsData = await feedsDataPromise;
       const start = performance.now();
+      
+      const fetchWithRetry = async (retries = 2): Promise<FeedData | null> => {
+        for (let attempt = 0; attempt <= retries; attempt++) {
+          try {
+            const nextFeedData = await fetchFeedData(feedConfig);
+            return nextFeedData;
+          } catch (error) {
+            if (attempt === retries) {
+              // Final attempt failed, throw to outer catch
+              throw error;
+            }
+            console.log(
+              `Retry ${attempt + 1}/${retries} for feed ${feedConfig.id} after error: ${error}`
+            );
+          }
+        }
+        return null; // This line should never be reached, but satisfies TypeScript
+      };
+      
       try {
-        const nextFeedData = await fetchFeedData(feedConfig);
+        const nextFeedData = await fetchWithRetry();
         if (isNotNull(nextFeedData)) {
           feedsData.push(nextFeedData);
         } else {
           console.log("Feed data is NULL!: ", feedConfig.id, feedConfig.url);
-
           const firstUrl = Array.isArray(feedConfig.url) ? feedConfig.url[0] : feedConfig.url;
           feedsData.push({
             title: feedConfig.title ?? feedConfig.id,
@@ -37,7 +55,7 @@ export async function run(configFilePath = "./feeds.toml"): Promise<void> {
         }
       } catch (error) {
         console.log(
-          `Failed to fetch feed data (${error}): `,
+          `Failed to fetch feed data after retries (${error}): `,
           feedConfig.id,
           feedConfig.url
         );
@@ -46,11 +64,11 @@ export async function run(configFilePath = "./feeds.toml"): Promise<void> {
             error instanceof Error ? error : new Error(String(error));
         }
         const firstUrl = Array.isArray(feedConfig.url) ? feedConfig.url[0] : feedConfig.url;
-          feedsData.push({
-            title: feedConfig.title ?? feedConfig.id,
-            url: firstUrl,
-            elements: [],
-          });
+        feedsData.push({
+          title: feedConfig.title ?? feedConfig.id,
+          url: firstUrl,
+          elements: [],
+        });
       }
       const end = performance.now();
       debug(`Fetching feed ${feedConfig.id} took ${(end - start).toFixed(2)} ms`);
