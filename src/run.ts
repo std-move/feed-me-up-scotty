@@ -33,7 +33,7 @@ export async function run(configFilePath = "./feeds.toml"): Promise<void> {
               throw error;
             }
             console.log(
-              `Retry ${attempt + 1}/${retries} for feed ${feedConfig.id} after error: ${error}`
+              `[FEED_GEN_ERR] Retry ${attempt + 1}/${retries} for feed ${feedConfig.id} after error: ${error}`
             );
           }
         }
@@ -45,7 +45,7 @@ export async function run(configFilePath = "./feeds.toml"): Promise<void> {
         if (isNotNull(nextFeedData)) {
           feedsData.push(nextFeedData);
         } else {
-          console.log("Feed data is NULL!: ", feedConfig.id, feedConfig.url);
+          console.log("[FEED_GEN_ERR] Feed data is NULL!: ", feedConfig.id, feedConfig.url);
           const firstUrl = Array.isArray(feedConfig.url) ? feedConfig.url[0] : feedConfig.url;
           feedsData.push({
             title: feedConfig.title ?? feedConfig.id,
@@ -55,7 +55,7 @@ export async function run(configFilePath = "./feeds.toml"): Promise<void> {
         }
       } catch (error) {
         console.log(
-          `Failed to fetch feed data after retries (${error}): `,
+          `[FEED_GEN_ERR] Failed to fetch feed data after retries (${error}): `,
           feedConfig.id,
           feedConfig.url
         );
@@ -95,7 +95,7 @@ export async function run(configFilePath = "./feeds.toml"): Promise<void> {
   }
 
   if (savedError) {
-    console.log("Throwing error saved during processing");
+    console.log("[FEED_GEN_ERR] Throwing error saved during processing");
     throw savedError;
   }
 }
@@ -201,7 +201,7 @@ async function tolerantGoto(
             (currentWaitUntil === 'load' || currentWaitUntil === 'networkidle') && 
             !hasTriedFallback) {
           console.warn(
-            `Timeout with waitUntil='${currentWaitUntil}' on attempt ${i + 1}/${maxRetries}. ` +
+            `[FEED_GEN_ERR] Timeout with waitUntil='${currentWaitUntil}' on attempt ${i + 1}/${maxRetries}. ` +
             `Falling back to 'domcontentloaded'...`
           );
           currentWaitUntil = 'domcontentloaded';
@@ -222,7 +222,7 @@ async function tolerantGoto(
           } else {
             // Final attempt failed - log error but suppress it
             console.error(
-              `NS_BINDING_ABORTED persists after ${maxRetries} attempts. ` +
+              `[FEED_GEN_ERR] NS_BINDING_ABORTED persists after ${maxRetries} attempts. ` +
               `Suppressing error and continuing. URL: ${url}`
             );
             return; // Suppress the error on final attempt
@@ -310,7 +310,7 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData | null> {
     if (config.onFail === "stale") {
       const existingFeedData = await fetchExistingFeedData(config.id);
       debug(
-        `Could not fetch ${config.id}; preserving existing feed.`,
+        `[FEED_GEN_ERR] Could not fetch ${config.id}; preserving existing feed.`,
         "warning"
       );
       return existingFeedData;
@@ -318,7 +318,7 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData | null> {
 
     if (config.onFail === "exclude") {
       debug(
-        `Could not fetch ${config.id}; not generating its feed.`,
+        `[FEED_GEN_ERR] Could not fetch ${config.id}; not generating its feed.`,
         "warning"
       );
       return null;
