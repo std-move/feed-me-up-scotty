@@ -315,11 +315,11 @@ async function fetchFeedData(config: FeedConfig): Promise<FeedData | null> {
 async function fetchPageEntries(
   page: Page,
   url: string,
-  baseUrl: string,
+  firstUrl: string,
   config: FeedConfig
 ): Promise<FeedData["elements"]> {
-  // already fetched otherwise...
-  if (url !== baseUrl) {
+  // firstUrl is already fetched!
+  if (url !== firstUrl) {
     try {
       await tolerantGoto(page, url, config);
       if (typeof config.waitForSelector === "string") {
@@ -340,7 +340,7 @@ async function fetchPageEntries(
     entriesElements.map(async (entryElement) => {
       const title = await getTitle(entryElement, config.titleSelector);
       const link = config.linkSelector
-          ? await getLink(entryElement, config.linkSelector, baseUrl)
+          ? await getLink(entryElement, config.linkSelector, url)
           : undefined;
 
       if (!link && !title) {
@@ -357,7 +357,7 @@ async function fetchPageEntries(
           config.dateSelector,
           config.dateFormat
         ),
-        image: await getImage(entryElement, config.imageSelector, baseUrl),
+        image: await getImage(entryElement, config.imageSelector, url),
       };
     })
   );
