@@ -175,12 +175,12 @@ export async function getDate(
       );
 
       // Check if date is in the future and adjust
-      while (parsedDate.getTime() > DATE_NOW) {
-        console.warn(
-          `Date ${parsedDate.toISOString()} is in the future (${dateString.trim()}). Subtracting 1 year.`
-        );
-        parsedDate = new Date(parsedDate.setFullYear(parsedDate.getFullYear() - 1));
-      }
+      // while (parsedDate.getTime() > DATE_NOW) {
+      //   console.warn(
+      //     `Date ${parsedDate.toISOString()} is in the future (${dateString.trim()}). Subtracting 1 year.`
+      //   );
+      //   parsedDate = new Date(parsedDate.setFullYear(parsedDate.getFullYear() - 1));
+      // }
 
       dateValue = parsedDate.getTime();
     }
@@ -212,12 +212,12 @@ export async function getDate(
       let adjustedDate = parsedDatetime;
 
       // Check if date is in the future and adjust
-      while (adjustedDate.getTime() > DATE_NOW) {
-        console.warn(
-          `Date ${adjustedDate.toISOString()} is in the future (datetime="${datetimeAttribute}"). Subtracting 1 year.`
-        );
-        adjustedDate = new Date(adjustedDate.setFullYear(adjustedDate.getFullYear() - 1));
-      }
+      // while (adjustedDate.getTime() > DATE_NOW) {
+      //   console.warn(
+      //     `Date ${adjustedDate.toISOString()} is in the future (datetime="${datetimeAttribute}"). Subtracting 1 year.`
+      //   );
+      //   adjustedDate = new Date(adjustedDate.setFullYear(adjustedDate.getFullYear() - 1));
+      // }
 
       dateValue = adjustedDate.getTime();
     }
@@ -232,12 +232,12 @@ export async function getDate(
     );
 
     // Check if date is in the future and adjust
-    while (parsedDate.getTime() > DATE_NOW) {
-      console.warn(
-        `Date ${parsedDate.toISOString()} is in the future (content="${dateElementContent.trim()}"). Subtracting 1 year.`
-      );
-      parsedDate = new Date(parsedDate.setFullYear(parsedDate.getFullYear() - 1));
-    }
+    // while (parsedDate.getTime() > DATE_NOW) {
+    //   console.warn(
+    //     `Date ${parsedDate.toISOString()} is in the future (content="${dateElementContent.trim()}"). Subtracting 1 year.`
+    //   );
+    //   parsedDate = new Date(parsedDate.setFullYear(parsedDate.getFullYear() - 1));
+    // }
 
     dateValue = parsedDate.getTime();
   }
