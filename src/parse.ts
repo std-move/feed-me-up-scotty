@@ -91,7 +91,7 @@ function parseUrl(linkValue: string, baseUrl: string | URL): URL | null {
         }
       }
 
-      return null; // Return null if all attempts fail
+      throw new Error(`Unable to get valid URI for [${linkValue}] base [${baseUrl}]`);
     }
   }
 }
