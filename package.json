@@ -14,7 +14,7 @@
   "author": "",
   "license": "AGPL-3.0",
   "dependencies": {
-    "@ltd/j-toml": "^1.24.0",
+    "@ltd/j-toml": "^1.35.3",
     "date-fns": "^2.23.0",
     "feed": "^4.2.2",
     "node-fetch": "^2.6.1",
