@@ -479,33 +479,49 @@ async function reconcileDates(
   };
 }
 
+function maybeAddTrailingSlash(path: string): string {
+  return path.endsWith("/") ? path : (path + "/");
+}
+
 const existingFeedData: Record<string, FeedData> = {};
 async function fetchExistingFeedData(feedId: string): Promise<FeedData | null> {
   if (typeof existingFeedData[feedId] !== "undefined") {
     return existingFeedData[feedId];
   }
 
-  const rootUrl = getRootUrl();
-  if (typeof rootUrl !== "string") {
-    return null;
-  }
+  console.log(`Trying to fetch existing feed data for ${feedId}`);
+  let existingData: FeedData;
   try {
-    const response = await fetch(`${rootUrl}${feedId}.json`);
-    if (!response.ok) {
-      return null;
-    }
+    let localFeedPath = process.env.FEED_DATA_PATH;
+    if (localFeedPath) {
+      localFeedPath = maybeAddTrailingSlash(localFeedPath);
+      console.log(`Found local feed path ${localFeedPath}, will fetch from it`);
+      const filePath = `${localFeedPath}${feedId}.json`;
+      const fileContent = await readFile(filePath, 'utf-8');
+      existingData = JSON.parse(fileContent);
+    } else {
+      const rootUrl = getRootUrl();
+      if (typeof rootUrl !== "string") {
+        console.log("Failed to get root URI");
+        return null;
+      }
 
-    const existingData: FeedData = await response.json();
+      const uri = `${rootUrl}${feedId}.json`;
+      console.log(`Will try to fetch existing data from ${uri}`);
+      const response = await fetch(uri);
+      if (!response.ok) {
+        console.log("Fetching failed!");
+        return null;
+      }
+
+      existingData = await response.json();
+    }
     existingFeedData[feedId] = existingData;
     return existingData;
-  } catch (e: unknown) {
-    const message =
-      e instanceof Error
-        ? `Encountered error fetching existing feed for ${feedId}:` + e.message
-        : `Encountered error fetching existing feed for ${feedId}.`;
-    debug(message, "warning");
-    return null;
+  } catch (error) {
+    console.log("Encountered error fetching existing feed:", error);
   }
+  return null;
 }
 
 function getRootUrl(): string | undefined {
@@ -513,10 +529,8 @@ function getRootUrl(): string | undefined {
   if (typeof rootUrl !== "string") {
     return rootUrl;
   }
-  const rootUrlWithTrailingSlash = rootUrl.endsWith("/")
-    ? rootUrl
-    : rootUrl + "/";
-  return rootUrlWithTrailingSlash;
+  
+  return maybeAddTrailingSlash(rootUrl);
 }
 
 function isNotNull<X>(value: X | null): value is X {
