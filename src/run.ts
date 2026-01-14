@@ -59,10 +59,29 @@ export async function run(configFilePath = "./feeds.toml"): Promise<void> {
           feedConfig.id,
           feedConfig.url
         );
-        if (!savedError) {
-          savedError =
-            error instanceof Error ? error : new Error(String(error));
+
+        let firstFailureOfFeed = false;
+        let scheduled = process.env.IS_SCHEDULED;
+        if (scheduled) {
+          const prevData = await fetchExistingFeedData(feedConfig.id);
+          if (prevData && prevData.elements.length > 0) firstFailureOfFeed = true;
         }
+
+        if (firstFailureOfFeed) {
+          // some sites might be down once in a while.
+          // if fetching such sites fails at least twice in a row, we want to know about it.
+          // otherwise let's just log it to avoid job failure notification 'spam'.
+          console.log(
+            `[FEED_GEN_ERR] Feed [${feedConfig.id}] was successfully fetched in the last run, ` +
+            `let's suppress the error this time and raise it next time`
+          );
+        } else {
+          if (!savedError) {
+            savedError =
+              error instanceof Error ? error : new Error(String(error));
+          }
+        }
+
         const firstUrl = Array.isArray(feedConfig.url) ? feedConfig.url[0] : feedConfig.url;
         feedsData.push({
           title: feedConfig.title ?? feedConfig.id,
