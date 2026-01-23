@@ -101,14 +101,25 @@ export async function getLink(
   linkSelector: Required<FeedConfig>["linkSelector"],
   baseUrl: string
 ): Promise<FeedData["elements"][0]["link"]> {
+  let linkMandatory = true;
+  if (typeof linkSelector === "string" && linkSelector.startsWith("optional:")) {
+    linkSelector = linkSelector.slice("optional:".length);
+    linkMandatory = false;
+  }
+
   const linkElement =
     linkSelector === "*" ? entryElement : await entryElement.$(linkSelector);
 
-  if (!linkElement && linkSelector !== "*") {
+  if (!linkElement && linkMandatory) {
     throw new Error(`No element found for link selector: "${linkSelector}"`);
   }
 
   const linkValue = await linkElement?.getAttribute("href");
+
+  if (!linkValue && linkMandatory) {
+    throw new Error(`No href found in link element: "${linkSelector}"`);
+  }
+
   const normalisedLink = linkValue
     ? parseUrl(linkValue, baseUrl)?.href
     : undefined;
